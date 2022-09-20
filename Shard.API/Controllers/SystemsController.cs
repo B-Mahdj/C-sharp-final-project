@@ -14,7 +14,7 @@ namespace Shard.API.Controllers
         private static List<StarSystem> array = null;
 
         [HttpGet]
-        public ActionResult<List<SystemSpecification>> Get([FromServices] Sector sector)
+        public ActionResult<List<StarSystem>> Get([FromServices] Sector sector)
         {
 
             return Ok(sector.Systems);

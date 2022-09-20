@@ -8,12 +8,13 @@ namespace Shard.API.Models
     {
         public List<StarSystem> Systems { get; set; }
 
-        public SectorSpecification Generate(MapGenerator map)
+        public List<StarSystem> Generate(MapGenerator map)
         {
-            var previousSector = map.Generate();
-            return previousSector;
-            //Sector finalSector = (Sector)previousSector;
-            //return finalSector;
+            SectorSpecification previousSector = map.Generate();
+            //return previousSector;
+            Sector finalSector = (Sector)previousSector;
+            Systems = finalSector.Systems.ToList();
+            return Systems;
         }
 
         public static explicit operator Sector(SectorSpecification sector)

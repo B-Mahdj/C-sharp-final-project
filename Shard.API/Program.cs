@@ -27,8 +27,8 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.MapControllers();
-var map = app.Services.GetService<MapGenerator>();
-var sectorFinale = app.Services.GetService<Sector>();
+MapGenerator map = app.Services.GetService<MapGenerator>();
+Sector sectorFinale = app.Services.GetService<Sector>();
 sectorFinale.Generate(map);
 app.Run();
 

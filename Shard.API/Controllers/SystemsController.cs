@@ -1,63 +1,75 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shard.API.Models;
+using Shard.Shared.Core;
 using System.Linq;
 
 namespace Shard.API.Controllers
 {
+
     [Route("[controller]")]
     [ApiController]
     public class SystemsController : ControllerBase
     {
         private static List<StarSystem> array = null;
+
         [HttpGet]
-        public IEnumerable<StarSystem> Get()
+        public ActionResult<List<SystemSpecification>> Get([FromServices] Sector sector)
         {
-            array = Enumerable.Range(1, 5).Select(index => new StarSystem(new Random())).ToList();
-            return (IEnumerable<StarSystem>)array;
+
+            return Ok(sector.Systems);
         }
 
         [HttpGet("{systemName}")]
-        public StarSystem GetSystem(string systemName)
+        public ActionResult<StarSystem> GetSystem(string systemName, [FromServices] Sector sector)
         {
             StarSystem? starsystem = null;
-            foreach (var system in Get().Where(system => system.Name == systemName))
+            foreach (var system in sector.Systems)
             {
-                Console.WriteLine(system.Name);
-                starsystem = system;
+                if (system.Name == systemName) { starsystem = system; return Ok(starsystem); }
+
             }
-            return starsystem;
+            return BadRequest();
 
 
         }
+
         [HttpGet("{systemName}/planets")]
-        public List<Planet> GetPlanets(string systemName)
+        public ActionResult<Planet> GetPlanets(string systemName, [FromServices] Sector sector)
         {
-            List<Planet> planetList = new List<Planet>();
-            foreach (var system in Get().Where(system => system.Name == systemName))
+            List<Planet> planetList = null;
+            foreach (var system in sector.Systems)
             {
-                StarSystem starsystem = system;
-                planetList = starsystem.Planets.ToList();
-               
+                if (system.Name == systemName)
+                {
+                    StarSystem starsystem = system;
+                    planetList = starsystem.Planets.ToList();
+                    return Ok(planetList);
+                }
+
             }
-           return planetList;
+            return BadRequest();
         }
 
         [HttpGet("{systemName}/planets/{planetName}")]
-        public Planet GetPlanet(string systemName, string planetName)
+        public ActionResult<Planet> GetPlanet(string systemName, string planetName, [FromServices] Sector sector)
         {
             Planet? planet = null;
-            StarSystem starsystem;
-            foreach (var system in Get().Where(system => system.Name == systemName))
+            foreach (var system in sector.Systems)
             {
-                starsystem = system;
-                foreach (var p in starsystem.Planets.Where(p => p.Name == planetName))
+                if (system.Name == systemName)
                 {
-                    planet = p;
+                    StarSystem starsystem = system;
+                    foreach (var p in starsystem.Planets)
+                    {
+                        if (p.Name == planetName)
+                        {
+                            return Ok(planet = p);
+                        }
+                    }
                 }
             }
-            return planet;
+            return BadRequest();
         }
-
     }
 }

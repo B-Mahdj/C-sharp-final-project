@@ -4,9 +4,13 @@ namespace Shard.API.Models
 {
     public class StarSystem
     {
-        public string Name { get; }
-        public IReadOnlyList<Planet> Planets { get; }
+        public string Name { get; set; }
+        public IReadOnlyList<Planet> Planets { get; set; }
 
+        public StarSystem(string parName) 
+        {
+            Name = parName;
+        }
         internal StarSystem(Random random)
         {
             Name = random.NextGuid().ToString();

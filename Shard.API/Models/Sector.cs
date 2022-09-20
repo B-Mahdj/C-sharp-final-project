@@ -1,19 +1,24 @@
-﻿namespace Shard.API.Models
+﻿using Newtonsoft.Json;
+using Shard.Shared.Core;
+using System.Text.Json.Serialization;
+
+namespace Shard.API.Models
 {
     public class Sector
     {
-        public IReadOnlyList<StarSystem> Systems { get; }
+        public List<StarSystem> Systems { get; set; }
 
-        internal Sector(Random random)
+        public SectorSpecification Generate(MapGenerator map)
         {
-            Systems = Generate(10, random);
+            var previousSector = map.Generate();
+            return previousSector;
+            //Sector finalSector = (Sector)previousSector;
+            //return finalSector;
         }
 
-        private static List<StarSystem> Generate(int count, Random random)
-        {
-            return Enumerable.Range(1, count)
-                .Select(_ => new StarSystem(random))
-                .ToList();
-        }
+        public static explicit operator Sector(SectorSpecification sector)
+      {
+        return JsonConvert.DeserializeObject<Sector>(JsonConvert.SerializeObject(sector))!;
+      }
     }
 }

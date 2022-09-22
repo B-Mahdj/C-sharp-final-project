@@ -8,7 +8,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shard.Shared.Core", "Shard.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shard.API", "Shard.API\Shard.API.csproj", "{DE607B69-B80A-4929-BF3F-CBE983D2B9E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shard.IntegrationTests", "SHard.IntegrationTets\Shard.IntegrationTests.csproj", "{C6805E77-58B0-447F-BDE9-25FB7F01B71F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shard.IntegrationTests", "Shard.IntegrationTests\Shard.IntegrationTests.csproj", "{C6805E77-58B0-447F-BDE9-25FB7F01B71F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

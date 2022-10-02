@@ -2,7 +2,7 @@
 
 public record Planet(JObjectAsserter Json)
 { 
-    public Planet(JTokenAsserter json)
+    public Planet(JTokenAsserter json) 
         : this(json.AssertObject())
     {
     }

@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Shard.API\Shard.API.csproj" />
+    <ProjectReference Include="..\Shard.Shared.Core\Shard.Shared.Core.csproj" />
     <ProjectReference Include="..\Shard.Shared.Web.IntegrationTests\Shard.Shared.Web.IntegrationTests.csproj" />
   </ItemGroup>
 

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Shard.API.Controllers
 {
-    [Route("api/users/{uid}/[controller]")]
+    [Route("users/ ")]
     [ApiController]
     public class UnitsController : ControllerBase
     {

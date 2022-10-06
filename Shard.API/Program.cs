@@ -12,6 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<MapGenerator>();
 builder.Services.AddSingleton<Sector>();
+builder.Services.AddSingleton(new List<User>());
 
 builder.Configuration.GetSection("MapGeneratorOptions");
 
@@ -30,6 +31,7 @@ app.MapControllers();
 MapGenerator map = app.Services.GetService<MapGenerator>();
 Sector sectorFinale = app.Services.GetService<Sector>();
 sectorFinale.Generate(map);
+app.Services.GetService<List<User>>();
 app.Run();
 
 

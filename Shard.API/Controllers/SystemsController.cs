@@ -11,8 +11,6 @@ namespace Shard.API.Controllers
     [ApiController]
     public class SystemsController : ControllerBase
     {
-        private static List<StarSystem> array = null;
-
         [HttpGet]
         public ActionResult<List<StarSystem>> Get([FromServices] Sector sector)
         {
@@ -23,21 +21,19 @@ namespace Shard.API.Controllers
         [HttpGet("{systemName}")]
         public ActionResult<StarSystem> GetSystem(string systemName, [FromServices] Sector sector)
         {
-            StarSystem? starsystem = null;
+            StarSystem? starsystem;
             foreach (var system in sector.Systems)
             {
                 if (system.Name == systemName) { starsystem = system; return Ok(starsystem); }
 
             }
             return BadRequest();
-
-
         }
 
         [HttpGet("{systemName}/planets")]
         public ActionResult<Planet> GetPlanets(string systemName, [FromServices] Sector sector)
         {
-            List<Planet> planetList = null;
+            List<Planet>? planetList;
             foreach (var system in sector.Systems)
             {
                 if (system.Name == systemName)
@@ -54,7 +50,7 @@ namespace Shard.API.Controllers
         [HttpGet("{systemName}/planets/{planetName}")]
         public ActionResult<Planet> GetPlanet(string systemName, string planetName, [FromServices] Sector sector)
         {
-            Planet? planet = null;
+            Planet? planet;
             foreach (var system in sector.Systems)
             {
                 if (system.Name == systemName)

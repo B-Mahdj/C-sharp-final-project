@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Shard.API.Models;
+using System.Text.RegularExpressions;
 
 namespace Shard.API.Controllers
 {
@@ -18,12 +19,16 @@ namespace Shard.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public ActionResult<User> AddUser(string id, string pseudo)
+        public ActionResult<User> AddUser(User user, string id)
         {
 
             //TODO : Return 404 if : 
             //If there is no body, or if the id in the body is different than the one in the url.
-            User user = new User(id, pseudo);
+            if (user == null || user.id != id || !(Regex.IsMatch(user.id, "^[a-zA-Z0-9]*$")))
+            {
+                return BadRequest();
+            }
+
             _users.Add(user);
             return Ok(user);
         }
@@ -38,7 +43,7 @@ namespace Shard.API.Controllers
                     return Ok(u);
                 }
             }
-            return BadRequest();
+            return NotFound();
         }
 
 

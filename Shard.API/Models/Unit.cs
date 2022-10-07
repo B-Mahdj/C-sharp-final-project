@@ -5,21 +5,22 @@ namespace Shard.API.Models
     public class Unit
     {
         public string Id { get; set; }
-        public string type { get; set; }
-        public string system { get; set; }
-        public string planet { get; set; }
+        public string Type { get; set; }
+        public string System { get; set; }
+        public string Planet { get; set; }
+
 
         [JsonConstructor]
         public Unit(string id, string type, string system, string? planet)
         {
             this.Id = id;
-            this.type = type;
-            this.system = system;
+            this.Type = type;
+            this.System = system;
             if(planet != null)
             {
-                this.planet = planet;
+                this.Planet = planet;
             }
-            else { this.planet= "";}
+            else { this.Planet= "";}
             
         }
     }

@@ -1,28 +1,28 @@
 ﻿using Shard.Shared.Core;
-using System;
+using System.Text.Json.Serialization;
 
 namespace Shard.API.Models
 {
-    public class Planet
+    public class PlanetJson
     {
         public string Name { get; set; }
         public int Size { get; set; }
-
+        [JsonIgnore]
         public IReadOnlyDictionary<ResourceKind, int> ResourceQuantity { get; set; }
 
-        internal Planet(Random random)
+        internal PlanetJson(Random random)
         {
             Name = random.NextGuid().ToString();
 
             Size = 1 + random.Next(999);
             ResourceQuantity = new RandomShareComputer(random).GenerateResources(Size);
         }
-        public Planet(string parName, int parSize, IReadOnlyDictionary<ResourceKind, int> parRessources )
+        public PlanetJson(Planet planet)
         {
-            Name = parName;
-            Size = parSize;
-            ResourceQuantity = parRessources;
-            
+            Name = planet.Name;
+            Size = planet.Size;
+            ResourceQuantity = planet.ResourceQuantity;
+
         }
     }
 }

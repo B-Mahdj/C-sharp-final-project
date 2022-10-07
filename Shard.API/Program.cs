@@ -14,7 +14,6 @@ builder.Services.AddSingleton<MapGenerator>();
 builder.Services.AddSingleton<Sector>();
 builder.Services.AddSingleton(new List<User>());
 builder.Services.AddSingleton(new List<Sector>());
-builder.Services.AddSingleton(new Dictionary<User,List<Unit>>());
 
 builder.Configuration.GetSection("MapGeneratorOptions");
 
@@ -30,11 +29,13 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.MapControllers();
-MapGenerator map = app.Services.GetService<MapGenerator>();
-Sector sectorFinale = app.Services.GetService<Sector>();
-sectorFinale.Generate(map);
+MapGenerator? map = app.Services.GetService<MapGenerator>();
+Sector? sectorFinale = app.Services.GetService<Sector>();
+if (sectorFinale != null)
+    if (map != null)
+    sectorFinale.Generate(map);
+
 app.Services.GetService<List<User>>();
-app.Services.GetService<Dictionary<User,List<Unit>>>();
 app.Run();
 
 

@@ -10,35 +10,35 @@ namespace Shard.API.Controllers
     [ApiController]
     public class UnitsController : ControllerBase
     {
-        private Dictionary<User, List<Unit>> _units;
+        private readonly List<User> _users;
 
-        public UnitsController([FromServices]Dictionary<User,List<Unit>> list)
+        public UnitsController([FromServices] List<User> list)
         {
-            _units = list;
+            _users = list;
         }
 
         [HttpGet("{id}/[controller]")]
         public ActionResult<List<Unit>> GetUserUnits(string id)
         {
-            foreach (var unit in _units)
+            foreach (var user in _users)
             {
-                if (unit.Key.id == id) 
-                    return Ok(unit.Value);
+                if (user.Id == id)
+                    return user.Units;
             }
             return NotFound();
         }
 
         [HttpGet("{id}/[controller]/{unitId}")]
-        public ActionResult<List<Unit>> GetUserUnit(string id, string unitId)
+        public ActionResult<Unit> GetUserUnit(string id, string unitId)
         {
-            foreach (var unit in _units)
+            foreach (var user in _users)
             {
-                if (unit.Key.id == id)
+                if (user.Id == id)
                 {
-                    foreach (var unit2 in unit.Value)
+                    foreach (var unit in user.Units)
                     {
-                        if (unit2.Id == unitId) 
-                            return Ok(unit2);
+                        if (unit.Id == unitId)
+                            return unit;
                     }
                 }
             }
@@ -49,21 +49,20 @@ namespace Shard.API.Controllers
         [HttpPut("{id}/[controller]/{unitId}")]
         public ActionResult<Unit> moveUnits(string id, string unitId, [FromBody]Unit newUnit)
         {
-            foreach (var unit in _units)
+            foreach (var user in _users)
             {
-                if (unit.Key.id == id)
+                if (user.Id == id)
                 {
-                    foreach (var unit2 in unit.Value)
+                    foreach (var unit in user.Units)
                     {
-                        if (unit2.Id == unitId)
+                        if (unit.Id == unitId)
                         {
                             if (newUnit == null || newUnit.Id != unitId)
                                 return BadRequest();
-                            unit2.system = newUnit.system;
-                            unit2.planet = newUnit.planet;
-                            return Ok(unit2);
+                            unit.system = newUnit.system;
+                            unit.planet = newUnit.planet;
+                            return unit;
                         }
-
                     }
                 }
             }

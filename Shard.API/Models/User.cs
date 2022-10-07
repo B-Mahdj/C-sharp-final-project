@@ -2,14 +2,16 @@
 {
     public class User
     {
-        public string id { get; set; }
-        public string pseudo { get; set; }
+        public string Id { get; set; }
+        public string Pseudo { get; set; }
         public string DateOfCreation { get; } = DateTime.Now.ToString();
+
+        public List<Unit> Units { get; } = new List<Unit>();
 
         public User(string id, string pseudo)
         {
-            this.id = id;
-            this.pseudo = pseudo;
+            this.Id = id;
+            this.Pseudo = pseudo;
         }
     }
 }

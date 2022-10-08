@@ -25,11 +25,5 @@ namespace Shard.API.Models
                 .Select(_ => new Planet(random))
                 .ToList();
         }
-        public Planet GetOneRandomPlanet()
-        {
-            Random random = new Random();
-            int randIndex = random.Next(Planets.Count);
-            return Planets[randIndex];
-        }
     }
 }

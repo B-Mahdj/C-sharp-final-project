@@ -11,36 +11,40 @@ namespace Shard.API.Controllers
     [ApiController]
     public class SystemsController : ControllerBase
     {
+        private static List<StarSystem> array = null;
+
         [HttpGet]
-        public ActionResult<List<StarSystemJson>> Get([FromServices] Sector sector)
+        public ActionResult<List<StarSystem>> Get([FromServices] Sector sector)
         {
-            return sector.Systems.Select(s => new StarSystemJson(s)).ToList();
+
+            return Ok(sector.Systems);
         }
 
         [HttpGet("{systemName}")]
-        public ActionResult<StarSystemJson> GetSystem(string systemName, [FromServices] Sector sector)
+        public ActionResult<StarSystem> GetSystem(string systemName, [FromServices] Sector sector)
         {
-            StarSystem? starsystem;
+            StarSystem? starsystem = null;
             foreach (var system in sector.Systems)
             {
-                if (system.Name == systemName) { starsystem = system; return new StarSystemJson(starsystem); }
+                if (system.Name == systemName) { starsystem = system; return Ok(starsystem); }
 
             }
             return BadRequest();
+
+
         }
 
         [HttpGet("{systemName}/planets")]
-        public ActionResult<List<PlanetJson>> GetPlanets(string systemName, [FromServices] Sector sector)
+        public ActionResult<Planet> GetPlanets(string systemName, [FromServices] Sector sector)
         {
-           
+            List<Planet> planetList = null;
             foreach (var system in sector.Systems)
             {
                 if (system.Name == systemName)
                 {
-                    StarSystem starSystem = system;
-                    //planetList = starsystem.Planets.ToList();
-                    //return planetList;
-                    return starSystem.Planets.Select(p => new PlanetJson(p)).ToList(); 
+                    StarSystem starsystem = system;
+                    planetList = starsystem.Planets.ToList();
+                    return Ok(planetList);
                 }
 
             }
@@ -48,9 +52,9 @@ namespace Shard.API.Controllers
         }
 
         [HttpGet("{systemName}/planets/{planetName}")]
-        public ActionResult<PlanetJson> GetPlanet(string systemName, string planetName, [FromServices] Sector sector)
+        public ActionResult<Planet> GetPlanet(string systemName, string planetName, [FromServices] Sector sector)
         {
-            Planet? planet;
+            Planet? planet = null;
             foreach (var system in sector.Systems)
             {
                 if (system.Name == systemName)
@@ -60,7 +64,7 @@ namespace Shard.API.Controllers
                     {
                         if (p.Name == planetName)
                         {
-                            return new PlanetJson(planet = p);
+                            return Ok(planet = p);
                         }
                     }
                 }

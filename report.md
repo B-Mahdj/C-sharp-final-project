@@ -24,27 +24,27 @@ Coefficient de qualité = 87.50%
 ### Version 2
 
 * Total: 15
-* Succès: 4
-* Taux: 0.3
+* Succès: 15
+* Taux: 1.0
 
 ### Total rendus
 
-Taux moyen = 0.63
+Taux moyen = 1.00
 
-Note intermédiaire = 1.8/3
+Note intermédiaire = 2.9/3
 
 ## Rendu complet
 
 * Total: 24
-* Succès: 13
-* Taux: 0.5
+* Succès: 24
+* Taux: 1.0
 
-Note intermédiaire = 5.4/10
+Note intermédiaire = 10.0/10
 
 ## Total 
 
-Sous-total: 7.2/13
+Sous-total: 12.9/13
 
 Impact qualité: 94%
 
-Total: 6.77/13
+Total: 12.05/13

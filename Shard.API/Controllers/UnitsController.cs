@@ -13,7 +13,7 @@ namespace Shard.API.Controllers
         private readonly List<User> _users;
         private readonly Sector _sector;
 
-        public UnitsController([FromServices] List<User> list, [FromServices] Sector sector)
+        public UnitsController(List<User> list, Sector sector)
         {
             _users = list;
             _sector = sector;
@@ -84,12 +84,12 @@ namespace Shard.API.Controllers
                         {
                             var system = (from s in _sector.Systems
                                          where s.Name == unit.System
-                                         select s).ToList();
+                                         select s).First();
 
-                            var planet = (from p in system[0].Planets
+                            var planet = (from p in system.Planets
                                          where p.Name == unit.Planet
-                                         select p).ToList();
-                            return new UnitLocation(system[0].Name, planet[0].Name, planet[0].ResourceQuantity);
+                                         select p).First();
+                            return new UnitLocation(system.Name, planet.Name, planet.ResourceQuantity);
                         }
                     }
                 }

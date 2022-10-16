@@ -10,6 +10,7 @@ namespace Shard.API.Models
         
         [JsonIgnore]
         public List<Unit> Units { get; }
+        public IReadOnlyDictionary<String, int> ResourcesQuantity { get; }
 
         public UserJson(User user)
         {
@@ -17,6 +18,7 @@ namespace Shard.API.Models
             this.Pseudo = user.Pseudo;
             this.DateOfCreation = user.DateOfCreation;
             this.Units = user.Units;
+            this.ResourcesQuantity = user.ResourcesQuantity;
         }
     }
 }

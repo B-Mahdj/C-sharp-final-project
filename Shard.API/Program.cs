@@ -15,6 +15,7 @@ builder.Services.AddSingleton<MapGenerator>();
 builder.Services.AddSingleton<Sector>();
 builder.Services.AddSingleton(new List<User>());
 builder.Services.AddSingleton(new List<Sector>());
+builder.Services.AddSingleton<IClock,SystemClock>();
 
 builder.Configuration.GetSection("MapGeneratorOptions");
 

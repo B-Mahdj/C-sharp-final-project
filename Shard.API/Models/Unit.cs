@@ -10,7 +10,8 @@ namespace Shard.API.Models
         public string? Planet { get; set; }
         public string DestinationSystem { get; set; } = "test";
         public string? DestinationPlanet { get; set; } = "test";
-        public string? EstimatedTimeofArrival { get; set; } = "test";
+        public string? EstimatedTimeOfArrival { get; set; } = "test";
+        public Task? _movingTask { get; set; }
 
 
         [JsonConstructor]

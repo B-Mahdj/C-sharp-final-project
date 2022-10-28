@@ -40,7 +40,7 @@ namespace Shard.API.Controllers
             {
                 if (user.Id == id)
                 {
-                    foreach (var unit in user.Units)
+                    foreach (Unit unit in user.Units)
                     {
                         if (unit.Id == unitId)
                         {
@@ -80,7 +80,7 @@ namespace Shard.API.Controllers
         }
 
         [HttpPut("{id}/[controller]/{unitId}")]
-        public ActionResult<Unit> moveUnits(string id, string unitId, [FromBody]Unit newUnit)
+        public ActionResult<Unit> moveUnits(string id, string unitId, Unit newUnit)
         {
             foreach (var user in _users)
             {

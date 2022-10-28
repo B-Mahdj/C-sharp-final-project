@@ -173,12 +173,12 @@ namespace Shard.API.Controllers
                         if (unit.Id == unitId)
                         {
                             var system = (from s in _sector.Systems
-                                          where s.Name == unit.System
-                                          select s).First();
+                                         where s.Name == unit.System
+                                         select s).First();
 
                             var planet = (from p in system.Planets
-                                          where p.Name == unit.Planet
-                                          select p).First();
+                                         where p.Name == unit.Planet
+                                         select p).First();
                             return new UnitLocation(system.Name, planet.Name, planet.ResourceQuantity);
                         }
                     }

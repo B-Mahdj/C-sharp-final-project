@@ -14,7 +14,7 @@ namespace Shard.API.Controllers
         private readonly List<User> _users;
         private readonly Sector _sector;
 
-        public UsersController([FromServices] List<User> list, [FromServices]Sector sector)
+        public UsersController(List<User> list, Sector sector)
         {
             _users = list;
             _sector = sector;
@@ -30,8 +30,12 @@ namespace Shard.API.Controllers
             {
                 return BadRequest();
             }
-            Unit firstUnit = new(Guid.NewGuid().ToString(),"scout", system.Name, system.GetOneRandomPlanet().Name);
+            string[] type = { "scout", "builder" };
+            string systemName = system.GetOneRandomPlanet().Name;
+            Unit firstUnit = new(Guid.NewGuid().ToString(), "scout", system.Name, systemName );
             user.Units.Add(firstUnit);
+            Unit secondUnit = new(Guid.NewGuid().ToString(), "builder", system.Name, systemName);
+            user.Units.Add(secondUnit);
             _users.Add(user);
             return new UserJson(user);
         }

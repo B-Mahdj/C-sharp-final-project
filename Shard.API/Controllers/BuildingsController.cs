@@ -25,28 +25,14 @@ namespace Shard.API.Controllers
             if (user == null) return NotFound();
             Unit? unit = user.Units.FirstOrDefault(x => x.Type.Equals("builder"));
             
-            if (unit == null || building == null || building.Type != "mine" || building.BuilderId != unit.Id || unit.System == null)
+            if (unit == null || building == null || building.Type != "mine" || building.BuilderId != unit.Id || unit.Planet==null)
             {
                 return BadRequest();
             }
             building.Id = Guid.NewGuid().ToString();
             building.System = unit.System;
             building.Planet = unit.Planet;
-            foreach (var s in _sector.Systems)
-            {
-                if (s.Name == unit.System)
-                {
-                    foreach (var p in s.Planets)
-                    {
-                        if (p.Name == unit.Planet)
-                        {
-                            p.Buildings.Add(building);
-                        }
-                    }
-                }
-            }
-            BuildingJson test = new BuildingJson(building);
-            return test;
+            return new BuildingJson(building);
         }
     }
 }

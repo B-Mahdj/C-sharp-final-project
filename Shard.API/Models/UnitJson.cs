@@ -2,7 +2,7 @@
 
 namespace Shard.API.Models
 {
-    public class Unit
+    public class UnitJson
     {
         public string Id { get; set; }
         public string Type { get; set; }
@@ -11,23 +11,20 @@ namespace Shard.API.Models
         public string? DestinationSystem { get; set; }
         public string? DestinationPlanet { get; set; }
         public string? EstimatedTimeOfArrival { get; set; }
+        [JsonIgnore]
         public Task? MovingTask { get; set; }
 
 
-        [JsonConstructor]
-        public Unit(string id, string type, string system, string planet)
+        public UnitJson(Unit unit)
         {
-            this.Id = id;
-            this.Type = type;
-            this.System = system;
-            this.Planet = planet;
-        }
-        public Unit(string id, string type, string system)
-        {
-            this.Id = id;
-            this.Type = type;
-            this.System = system;
-            this.Planet = null;
+            Id = unit.Id;
+            Type = unit.Type;
+            System = unit.System;
+            Planet = unit.Planet;
+            DestinationSystem = unit.DestinationSystem;
+            DestinationPlanet = unit.DestinationPlanet;
+            EstimatedTimeOfArrival = unit.EstimatedTimeOfArrival;
+            MovingTask = unit.MovingTask;
         }
     }
 }

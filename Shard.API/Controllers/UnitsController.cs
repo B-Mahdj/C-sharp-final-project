@@ -23,18 +23,18 @@ namespace Shard.API.Controllers
         }
 
         [HttpGet("{id}/[controller]")]
-        public ActionResult<List<Unit>> GetUserUnits(string id)
+        public ActionResult<List<UnitJson>> GetUserUnits(string id)
         {
             foreach (var user in _users)
             {
                 if (user.Id == id)
-                    return user.Units;
+                    return user.Units.Select(x => new UnitJson(x)).ToList();
             }
             return NotFound();
         }
 
         [HttpGet("{id}/[controller]/{unitId}")]
-        public async Task<ActionResult<Unit>> GetUserUnit(string id, string unitId)
+        public async Task<ActionResult<UnitJson>> GetUserUnit(string id, string unitId)
         {
             foreach (var user in _users)
             {
@@ -46,18 +46,18 @@ namespace Shard.API.Controllers
                         {
                             if (unit.EstimatedTimeOfArrival == null || unit.EstimatedTimeOfArrival == "" )
                             {
-                                return unit;
+                                return new UnitJson(unit);
                             }
                             else if (_systemClock.Now.AddSeconds(2) >= DateTime.Parse(unit.EstimatedTimeOfArrival)) 
                             {
                                 // Wait for end of task
                                 await unit.MovingTask;
                                 unit.EstimatedTimeOfArrival = "";
-                                return unit;
+                                return new UnitJson(unit);
                             }
                             else
                             {
-                                return unit;
+                                return new UnitJson(unit);
                             }
                         }
                     }
@@ -73,7 +73,7 @@ namespace Shard.API.Controllers
         }
 
         [HttpPut("{id}/[controller]/{unitId}")]
-        public ActionResult<Unit> moveUnits(string id, string unitId, Unit newUnit)
+        public ActionResult<UnitJson> MoveUnits(string id, string unitId, Unit newUnit)
         {
             foreach (var user in _users)
             {
@@ -113,7 +113,7 @@ namespace Shard.API.Controllers
                                 unit.EstimatedTimeOfArrival = _systemClock.Now.AddSeconds(75).ToString();
                             }
                             
-                            return unit;
+                            return new UnitJson(unit);
                         }
                     }
                 }
@@ -162,7 +162,11 @@ namespace Shard.API.Controllers
                             var planet = (from p in system.Planets
                                          where p.Name == unit.Planet
                                          select p).First();
-                            return new UnitLocation(system.Name, planet.Name, planet.ResourceQuantity);
+                            if(unit.Type.Equals("scout"))
+                            {
+                                return new UnitLocation(system.Name, planet.Name, planet.ResourceQuantity);
+                            }
+                            return new UnitLocation(system.Name, planet.Name);
                         }
                     }
                 }

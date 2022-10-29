@@ -30,10 +30,9 @@ namespace Shard.API.Controllers
             {
                 return BadRequest();
             }
-            string[] type = { "scout", "builder" };
             string systemName = system.GetOneRandomPlanet().Name;
             Unit firstUnit = new(Guid.NewGuid().ToString(), "scout", system.Name, systemName );
-            Unit secondUnit = new(Guid.NewGuid().ToString(), "builder", system.Name, systemName);
+            Unit secondUnit = new(Guid.NewGuid().ToString(), "builder", system.Name);
             user.Units.Add(firstUnit);
             user.Units.Add(secondUnit);
             _users.Add(user);

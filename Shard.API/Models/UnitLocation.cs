@@ -6,13 +6,19 @@ namespace Shard.API.Models
     {
         public string System { get; set; }
         public string Planet { get; set; }
-        public IReadOnlyDictionary<ResourceKind, int> ResourcesQuantity { get; set; }
+        public IReadOnlyDictionary<ResourceKind, int>? ResourcesQuantity { get; set; }
 
         public UnitLocation(string system, string planet, IReadOnlyDictionary<ResourceKind, int> resourceQuantity)
         {
             this.System = system;
             this.Planet = planet;
             ResourcesQuantity = resourceQuantity;
+        }
+        public UnitLocation(string system, string planet)
+        {
+            this.System = system;
+            this.Planet = planet;
+            ResourcesQuantity = null;
         }
     }
 }

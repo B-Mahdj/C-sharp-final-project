@@ -74,7 +74,7 @@ public partial class BaseIntegrationTests<TEntryPoint, TWebApplicationFactory>
         Assert.Equal(destinationPlanet, location["planet"].AssertString());
         location.AssertNullOrMissingProperty("resourcesQuantity");
     }
-		
+
     [Fact]
     [Trait("grading", "true")]
     [Trait("version", "3")]

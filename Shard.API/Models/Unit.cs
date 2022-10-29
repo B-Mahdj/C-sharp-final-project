@@ -8,7 +8,7 @@ namespace Shard.API.Models
         public string Type { get; set; }
         public string System { get; set; }
         public string? Planet { get; set; }
-        public string DestinationSystem { get; set; }
+        public string? DestinationSystem { get; set; }
         public string? DestinationPlanet { get; set; }
         public string? EstimatedTimeOfArrival { get; set; }
         public Task? _movingTask { get; set; }

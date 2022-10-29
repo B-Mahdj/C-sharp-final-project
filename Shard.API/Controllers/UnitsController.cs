@@ -48,17 +48,10 @@ namespace Shard.API.Controllers
                             {
                                 return unit;
                             }
-                            /*
-                            else if (getSecondsBetweenTwoDateTime(DateTime.Parse(unit.EstimatedTimeOfArrival), _systemClock.Now.AddSeconds(2)) <= 0)
-                            {
-                                unit.EstimatedTimeOfArrival = "";
-                                return unit;
-                            }
-                            */
                             else if (_systemClock.Now.AddSeconds(2) >= DateTime.Parse(unit.EstimatedTimeOfArrival)) 
                             {
                                 // Wait for end of task
-                                await unit._movingTask;
+                                await unit.MovingTask;
                                 unit.EstimatedTimeOfArrival = "";
                                 return unit;
                             }
@@ -93,21 +86,31 @@ namespace Shard.API.Controllers
                             if (newUnit == null || newUnit.Id != unitId)
                                 return BadRequest();
 
-                            if (newUnit.DestinationPlanet != null)
+                            if (newUnit.DestinationPlanet != null )
                             {
                                 unit.DestinationPlanet = newUnit.DestinationPlanet;
                             }
-                            unit.DestinationSystem = newUnit.DestinationSystem;
-
-                            if (newUnit.DestinationPlanet == null)
+                            if (newUnit.DestinationSystem != null)
                             {
-                                unit._movingTask = MoveUnitToNewSystem(unit, newUnit.DestinationSystem);
+                                unit.DestinationSystem = newUnit.DestinationSystem;
+                            }
+                            
+
+                            if (newUnit.DestinationPlanet == null && newUnit.DestinationSystem != null && unit.System != newUnit.DestinationSystem)
+                            {
+                                unit.MovingTask = MoveUnitToNewSystem(unit, newUnit.DestinationSystem);
                                 unit.EstimatedTimeOfArrival = _systemClock.Now.AddSeconds(60).ToString();
                             }
-                            else
+                            else if(newUnit.DestinationPlanet != null && unit.Planet != newUnit.DestinationPlanet && (newUnit.DestinationSystem == null  || unit.System == newUnit.DestinationSystem))
                             {
-                                unit._movingTask = MoveUnitToNewPlanet(unit, newUnit.DestinationSystem, newUnit.DestinationPlanet);
-                                unit.EstimatedTimeOfArrival = _systemClock.Now.AddSeconds(90).ToString();
+                                unit.MovingTask = MoveUnitToNewPlanet(unit, newUnit.DestinationPlanet);
+                                unit.EstimatedTimeOfArrival = _systemClock.Now.AddSeconds(15).ToString();
+                            }
+                            else if (newUnit.DestinationPlanet != null && newUnit.DestinationSystem != null 
+                                && unit.System != newUnit.DestinationSystem && unit.Planet != newUnit.DestinationPlanet)
+                            {
+                                unit.MovingTask = MoveUnitToNewSystemAndPlanet(unit, newUnit.DestinationSystem, newUnit.DestinationPlanet);
+                                unit.EstimatedTimeOfArrival = _systemClock.Now.AddSeconds(75).ToString();
                             }
                             
                             return unit;
@@ -117,47 +120,27 @@ namespace Shard.API.Controllers
             }
             return NotFound();
         }
-
-        /*
-        private void MoveUnitToNewSystem(Unit unit, string destinationSystem)
+        
+        private async Task MoveUnitToNewPlanet(Unit unit, string destinationPlanet)
         {
-            var timer = _systemClock.CreateTimer(_ =>
-                { 
-                    unit.DestinationSystem = destinationSystem;
-                    unit.DestinationPlanet = null;
-                },
-                null,
-                dueTime:60000,
-                period: 0
-            );
-        }
-
-        private void MoveUnitToNewPlanet(Unit unit, string destinationSystem, string destinationPlanet)
-        {
-            _systemClock.Delay(15000);
             unit.Planet = null;
-            MoveUnitToNewSystem(unit, destinationSystem);
-            _systemClock.Delay(15000);
+            await _systemClock.Delay(15000);
             unit.Planet = destinationPlanet;
             unit.DestinationPlanet = null;
         }
-        */
 
-        
         private async Task MoveUnitToNewSystem(Unit unit, string destinationSystem)
         {
             await _systemClock.Delay(60000);
             unit.System = destinationSystem;
-            unit.DestinationSystem = "";
+            unit.DestinationSystem = null;
         }
 
-        private async Task MoveUnitToNewPlanet(Unit unit, string destinationSystem, string destinationPlanet)
+        private async Task MoveUnitToNewSystemAndPlanet(Unit unit, string destinationSystem, string destinationPlanet)
         {
             unit.Planet = null;
             await MoveUnitToNewSystem(unit, destinationSystem);
-            await _systemClock.Delay(15000);
-            unit.Planet = destinationPlanet;
-            unit.DestinationPlanet = null;
+            await MoveUnitToNewPlanet(unit, destinationPlanet);
         }
         
 

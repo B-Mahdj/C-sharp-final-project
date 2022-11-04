@@ -15,7 +15,7 @@ namespace Shard.API.Models
         public Building(string type, string builderId)
         {
             this.Type = type;
-            this.BuilderId = builderId;
+            this.BuilderId = builderId;   
         }
 
     }

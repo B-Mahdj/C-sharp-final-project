@@ -29,10 +29,33 @@ namespace Shard.API.Controllers
             {
                 return BadRequest();
             }
+            if (building.ResourceCategory != "solid" && building.ResourceCategory != "liquid" && building.ResourceCategory != "gaseous")
+            {
+                return BadRequest();
+            }
             building.Id = Guid.NewGuid().ToString();
             building.System = unit.System;
             building.Planet = unit.Planet;
+            user.Buildings.Add(building);
             return new BuildingJson(building);
+        }
+
+        [HttpGet("{userId}/[controller]")]
+        public ActionResult<List<Building>> GetBuildings(string userId)
+        {
+            User? user = _users.FirstOrDefault(x => x.Id == userId);
+            if (user == null) return NotFound();
+            return user.Buildings;
+        }
+
+        [HttpGet("{userId}/[controller]/{buildingId}")]
+        public ActionResult<Building> GetBuilding(string userId, string buildingId)
+        {
+            User? user = _users.FirstOrDefault(x => x.Id == userId);
+            if (user == null) return NotFound();
+            Building? building = user.Buildings.FirstOrDefault(x => x.Id == buildingId && x.Type == "mine");
+            if (building == null) return NotFound();
+            return building;
         }
     }
 }

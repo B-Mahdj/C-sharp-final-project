@@ -9,6 +9,7 @@ namespace Shard.API.Models
         public string DateOfCreation { get; } = DateTime.Now.ToString();
 
         public List<Unit> Units { get; } = new List<Unit>();
+        public List<Building> Buildings { get; } = new List<Building>();
         public IReadOnlyDictionary<string, int> ResourcesQuantity { get; }
 
         public User(string id, string pseudo)

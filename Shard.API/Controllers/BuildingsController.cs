@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shard.API.Models;
+using Shard.Shared.Core;
 
 namespace Shard.API.Controllers
 {
@@ -37,7 +38,78 @@ namespace Shard.API.Controllers
             building.System = unit.System;
             building.Planet = unit.Planet;
             user.Buildings.Add(building);
+            MineRessources(building, user);
             return new BuildingJson(building);
+        }
+
+        private void MineRessources(Building mine, User user)
+        {
+            if (mine.ResourceCategory == "solid")
+            {
+                MineSolid(mine, user);
+            }
+            else if (mine.ResourceCategory == "liquid")
+            {
+                MineLiquid(mine, user);
+            }
+            else if (mine.ResourceCategory == "gaseous")
+            {
+                MineGas(mine, user);
+            }
+        }
+
+        private async Task MineSolid(Building mine, User user)
+        {
+            StarSystem? system = _sector.GetStarSystemByName(mine.System);
+            if (system == null) return;
+            Planet? planet = system.GetPlanetByName(mine.Planet);
+            if (planet == null) return;
+            while (true)
+            {
+                await Task.Delay(60000);
+                if (planet.GetNumberOfSolidRessourcesLeft() > 0)
+                {
+
+                }
+                else
+                {
+                    // For now nothing, because we may have organic ressources in V5 but we should return the task here 
+                    // to avoid having ressources being used for nothing
+                }
+
+            }
+        }
+
+        private async Task MineLiquid(Building mine, User user)
+        {
+            StarSystem? system = _sector.GetStarSystemByName(mine.System);
+            if (system == null) return;
+            Planet? planet = system.GetPlanetByName(mine.Planet);
+            if (planet == null) return;
+            while (true)
+            {
+                if (planet.GetNumberOfLiquidRessourcesLeft() > 0)
+                {
+                    // Add one ressource "water" to user and reduce this ressource from planet
+                    user.ResourcesQuantity.
+                }
+            }
+        }
+
+        private async Task MineGas(Building mine, User user)
+        {
+            StarSystem? system = _sector.GetStarSystemByName(mine.System);
+            if (system == null) return;
+            Planet? planet = system.GetPlanetByName(mine.Planet);
+            if (planet == null) return;
+            while (true)
+            {
+                if (planet.GetNumberOfGasRessourcesLeft() > 0)
+                {
+                    // Add one ressource "oxygen" to user from planet
+                    
+                }
+            }
         }
 
         [HttpGet("{userId}/[controller]")]

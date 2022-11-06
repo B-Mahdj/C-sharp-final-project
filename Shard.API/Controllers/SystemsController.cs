@@ -11,17 +11,23 @@ namespace Shard.API.Controllers
     [ApiController]
     public class SystemsController : ControllerBase
     {
-        [HttpGet]
-        public ActionResult<List<StarSystemJson>> Get([FromServices] Sector sector)
+        private readonly Sector _sector;
+        public SystemsController(Sector sector)
         {
-            return sector.Systems.Select(s => new StarSystemJson(s)).ToList();
+            _sector = sector;
+        }
+
+        [HttpGet]
+        public ActionResult<List<StarSystemJson>> Get()
+        {
+            return _sector.Systems.Select(s => new StarSystemJson(s)).ToList();
         }
 
         [HttpGet("{systemName}")]
-        public ActionResult<StarSystemJson> GetSystem(string systemName, [FromServices] Sector sector)
+        public ActionResult<StarSystemJson> GetSystem(string systemName)
         {
             StarSystem? starsystem;
-            foreach (var system in sector.Systems)
+            foreach (var system in _sector.Systems)
             {
                 if (system.Name == systemName) { starsystem = system; return new StarSystemJson(starsystem); }
 
@@ -30,10 +36,10 @@ namespace Shard.API.Controllers
         }
 
         [HttpGet("{systemName}/planets")]
-        public ActionResult<List<PlanetJson>> GetPlanets(string systemName, [FromServices] Sector sector)
+        public ActionResult<List<PlanetJson>> GetPlanets(string systemName)
         {
            
-            foreach (var system in sector.Systems)
+            foreach (var system in _sector.Systems)
             {
                 if (system.Name == systemName)
                 {
@@ -48,10 +54,10 @@ namespace Shard.API.Controllers
         }
 
         [HttpGet("{systemName}/planets/{planetName}")]
-        public ActionResult<PlanetJson> GetPlanet(string systemName, string planetName, [FromServices] Sector sector)
+        public ActionResult<PlanetJson> GetPlanet(string systemName, string planetName)
         {
             Planet? planet;
-            foreach (var system in sector.Systems)
+            foreach (var system in _sector.Systems)
             {
                 if (system.Name == systemName)
                 {

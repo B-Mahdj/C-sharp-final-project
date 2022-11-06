@@ -10,6 +10,9 @@ namespace Shard.API.Models
         [JsonIgnore]
         public IReadOnlyDictionary<ResourceKind, int> ResourceQuantity { get; set; }
 
+        [JsonIgnore]
+        public List<BuildingJson>? Buildings { get; set; } 
+
         internal PlanetJson(Random random)
         {
             Name = random.NextGuid().ToString();
@@ -22,7 +25,10 @@ namespace Shard.API.Models
             Name = planet.Name;
             Size = planet.Size;
             ResourceQuantity = planet.ResourceQuantity;
-
+            if(planet.Buildings != null)
+            {
+            this.Buildings = planet.Buildings.Select(x => new BuildingJson(x)).ToList();
+            }
         }
     }
 }

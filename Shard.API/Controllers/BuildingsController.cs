@@ -56,6 +56,7 @@ namespace Shard.API.Controllers
             {
                 MineGas(mine, user);
             }
+            return;
         }
 
         private async Task MineSolid(Building mine, User user)
@@ -69,6 +70,28 @@ namespace Shard.API.Controllers
                 await Task.Delay(60000);
                 if (planet.GetNumberOfSolidRessourcesLeft() > 0)
                 {
+                    // Pick first the most abundant resource on the planet
+
+                    //Default values
+                    ResourceKind mostAbundantRessources = ResourceKind.Carbon;
+                    int mostAbundantRessourcesQuantity = 0;
+                    foreach (var resource in planet.ResourceQuantity)
+                    {
+                        if (resource.Key.Equals(ResourceKind.Carbon) || resource.Key.Equals(ResourceKind.Aluminium) || resource.Key.Equals(ResourceKind.Gold) || resource.Key.Equals(ResourceKind.Iron) || resource.Key.Equals(ResourceKind.Titanium))
+                        {
+                            if (resource.Value > mostAbundantRessourcesQuantity)
+                            {
+                                mostAbundantRessources = resource.Key;
+                                mostAbundantRessourcesQuantity = resource.Value;
+                            }
+                            else if (resource.Value == mostAbundantRessourcesQuantity)
+                            {
+                                // If 2 resources are equally abundant, pick the one in that order : Titanium, Gold, Aluminium, Iron, Carbon
+                                
+                                
+                            }
+                        }
+                    }
 
                 }
                 else
@@ -88,11 +111,19 @@ namespace Shard.API.Controllers
             if (planet == null) return;
             while (true)
             {
+                await Task.Delay(60000);
                 if (planet.GetNumberOfLiquidRessourcesLeft() > 0)
                 {
                     // Add one ressource "water" to user and reduce this ressource from planet
-                    user.ResourcesQuantity["water"] -=1 ;
-
+                    planet.ResourceQuantity[ResourceKind.Water] -= 1;
+                    if (user.ResourcesQuantity.ContainsKey("Water"))
+                    {
+                        user.ResourcesQuantity["Water"] += 1;
+                    }
+                    else
+                    {
+                        user.ResourcesQuantity.Add("Water", 1);
+                    }
                 }
             }
         }
@@ -108,7 +139,15 @@ namespace Shard.API.Controllers
                 if (planet.GetNumberOfGasRessourcesLeft() > 0)
                 {
                     // Add one ressource "oxygen" to user from planet
-                    
+                    planet.ResourceQuantity[ResourceKind.Oxygen] -= 1;
+                    if (user.ResourcesQuantity.ContainsKey("Oxygen"))
+                    {
+                        user.ResourcesQuantity["Oxygen"] += 1;
+                    }
+                    else
+                    {
+                        user.ResourcesQuantity.Add("Oxygen", 1);
+                    }
                 }
             }
         }

@@ -34,7 +34,7 @@ namespace Shard.API.Models
             // Iterate through this.ResourceQuantity if key equals "aluminium", "carbon", "gold", "iron", "titanium" add value to numberOfSolidRessourcesLeft
             foreach (var resource in this.ResourceQuantity)
             {
-                if (resource.Key.Equals("aluminium") || resource.Key.Equals("carbon") || resource.Key.Equals("gold") || resource.Key.Equals("iron") || resource.Key.Equals("titanium"))
+                if (resource.Key.Equals(ResourceKind.Carbon) || resource.Key.Equals(ResourceKind.Aluminium) || resource.Key.Equals(ResourceKind.Gold) || resource.Key.Equals(ResourceKind.Iron) || resource.Key.Equals(ResourceKind.Titanium))
                 {
                     numberOfSolidRessourcesLeft += resource.Value;
                 }
@@ -48,7 +48,7 @@ namespace Shard.API.Models
             // Iterate through this.ResourceQuantity if key equals "water" add value to numberOfLiquidRessourcesLeft
             foreach (var resource in this.ResourceQuantity)
             {
-                if (resource.Key.Equals("Water"))
+                if (resource.Key.Equals(ResourceKind.Oxygen))
                 {
                     numberOfLiquidRessourcesLeft += resource.Value;
                 }
@@ -65,7 +65,7 @@ namespace Shard.API.Models
             // Iterate through this.ResourceQuantity if key equals "oxygen" add value to numberOfGasRessourcesLeft
             foreach (var resource in this.ResourceQuantity)
             {
-                if (resource.Key.Equals("oxygen"))
+                if (resource.Key.Equals(ResourceKind.Oxygen))
                 {
                     numberOfGasRessourcesLeft += resource.Value;
                 }

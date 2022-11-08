@@ -10,7 +10,7 @@ namespace Shard.API.Models
 
         public List<Unit> Units { get; } = new List<Unit>();
         public List<Building> Buildings { get; } = new List<Building>();
-        public IReadOnlyDictionary<string, int> ResourcesQuantity { get; }
+        public Dictionary<string, int> ResourcesQuantity { get; }
 
         public User(string id, string pseudo)
         {

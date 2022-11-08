@@ -17,10 +17,10 @@ namespace Shard.API.Models
             Name = random.NextGuid().ToString();
 
             Size = 1 + random.Next(999);
-            ResourceQuantity = new RandomShareComputer(random).GenerateResources(Size);
+            ResourceQuantity = (Dictionary<ResourceKind, int>?)new RandomShareComputer(random).GenerateResources(Size);
             Buildings = new List<Building>();
         }
-        public Planet(string parName, int parSize, IReadOnlyDictionary<ResourceKind, int> parRessources, List<Building> parBuildings)
+        public Planet(string parName, int parSize, Dictionary<ResourceKind, int> parRessources, List<Building> parBuildings)
         {
             Name = parName;
             Size = parSize;

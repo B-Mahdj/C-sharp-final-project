@@ -91,7 +91,8 @@ namespace Shard.API.Controllers
                 if (planet.GetNumberOfLiquidRessourcesLeft() > 0)
                 {
                     // Add one ressource "water" to user and reduce this ressource from planet
-                    user.ResourcesQuantity.
+                    user.ResourcesQuantity["water"] -=1 ;
+
                 }
             }
         }

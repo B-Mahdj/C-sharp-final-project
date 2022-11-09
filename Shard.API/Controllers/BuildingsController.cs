@@ -5,6 +5,7 @@ using Shard.Shared.Core;
 
 namespace Shard.API.Controllers
 {
+
     [Route("users")]
     [ApiController]
     public class BuildingsController : ControllerBase
@@ -12,11 +13,13 @@ namespace Shard.API.Controllers
 
         private readonly List<User> _users;
         private readonly Sector _sector;
+        private readonly IClock _systemClock;
 
-        public BuildingsController(List<User> list, Sector sector)
+        public BuildingsController(List<User> list, Sector sector, IClock systemClock)
         {
             _users = list;
             _sector = sector;
+            _systemClock = systemClock;
         }
 
         [HttpPost("{userId}/[controller]")]
@@ -38,23 +41,33 @@ namespace Shard.API.Controllers
             building.System = unit.System;
             building.Planet = unit.Planet;
             user.Buildings.Add(building);
-            MineRessources(building, user);
+            building.EstimatedBuildTime = _systemClock.Now.AddSeconds(300000).ToString();
+            building.IsBuilt = false;
+            BuildMine(building, user);
             return new BuildingJson(building);
         }
 
-        private void MineRessources(Building mine, User user)
+        private async Task BuildMine(Building building, User user)
         {
-            if (mine.ResourceCategory == "solid")
+            await Task.Delay(300000);
+            building.EstimatedBuildTime = "";
+            building.IsBuilt = true;
+            MineRessources(building, user);
+        }
+
+        private void MineRessources(Building building, User user)
+        {
+            if (building.ResourceCategory == "solid")
             {
-                MineSolid(mine, user);
+                MineSolid(building, user);
             }
-            else if (mine.ResourceCategory == "liquid")
+            else if (building.ResourceCategory == "liquid")
             {
-                MineLiquid(mine, user);
+                MineLiquid(building, user);
             }
-            else if (mine.ResourceCategory == "gaseous")
+            else if (building.ResourceCategory == "gaseous")
             {
-                MineGas(mine, user);
+                MineGas(building, user);
             }
             return;
         }
@@ -88,11 +101,11 @@ namespace Shard.API.Controllers
                             {
                                 // If 2 resources are equally abundant, pick the one in that order : Titanium, Gold, Aluminium, Iron, Carbon
                                 
-                                
                             }
                         }
                     }
-
+                    planet.ResourceQuantity[mostAbundantRessources] -= 1;
+                    user.ResourcesQuantity[mostAbundantRessources.ToString()] += 1;
                 }
                 else
                 {

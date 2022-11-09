@@ -12,6 +12,10 @@ namespace Shard.API.Models
         public string? System { get; set; }
         [JsonIgnore]
         public string? Planet { get; set; }
+        public Boolean IsBuilt { get; set; }
+        public string EstimatedBuildTime { get; set; } = "";
+
+
 
         public Building(string type, string builderId, string resourceCategory)
         {

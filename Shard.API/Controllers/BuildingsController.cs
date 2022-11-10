@@ -40,22 +40,22 @@ namespace Shard.API.Controllers
             building.Id = Guid.NewGuid().ToString();
             building.System = unit.System;
             building.Planet = unit.Planet;
-            user.Buildings.Add(building);
-            building.EstimatedBuildTime = _systemClock.Now.AddSeconds(300000).ToString();
             building.IsBuilt = false;
-            BuildMine(building, user);
+            building.EstimatedBuildTime = _systemClock.Now.AddMinutes(5);
+            building.BuildingTask = BuildMine(building, user);
+            user.Buildings.Add(building);
             return new BuildingJson(building);
         }
 
         private async Task BuildMine(Building building, User user)
         {
             await Task.Delay(300000);
-            building.EstimatedBuildTime = "";
+            building.EstimatedBuildTime = null;
             building.IsBuilt = true;
-            MineRessources(building, user);
+            //MineRessources(building, user);
         }
 
-        private void MineRessources(Building building, User user)
+        private async Task MineRessources(Building building, User user)
         {
             if (building.ResourceCategory == "solid")
             {
@@ -174,13 +174,28 @@ namespace Shard.API.Controllers
         }
 
         [HttpGet("{userId}/[controller]/{buildingId}")]
-        public ActionResult<Building> GetBuilding(string userId, string buildingId)
+        public async Task<ActionResult<BuildingJson>> GetBuilding(string userId, string buildingId)
         {
             User? user = _users.FirstOrDefault(x => x.Id == userId);
             if (user == null) return NotFound();
             Building? building = user.Buildings.FirstOrDefault(x => x.Id == buildingId && x.Type == "mine");
             if (building == null) return NotFound();
-            return building;
+            if (building.EstimatedBuildTime == null)
+            {
+                return new BuildingJson(building);
+            }
+            else if (_systemClock.Now.AddSeconds(2) >= building.EstimatedBuildTime.Value)
+            {
+                try
+                {
+                    await building.BuildingTask;
+                }
+                catch (OperationCanceledException)
+                {
+                    return NotFound("Building creation was cancelled");
+                }
+            }
+            return new BuildingJson(building);
         }
     }
 }

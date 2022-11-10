@@ -49,10 +49,10 @@ namespace Shard.API.Controllers
 
         private async Task BuildMine(Building building, User user)
         {
-            await Task.Delay(300000);
+            await _systemClock.Delay(300000);
             building.EstimatedBuildTime = null;
             building.IsBuilt = true;
-            //MineRessources(building, user);
+            MineRessources(building, user);
         }
 
         private async Task MineRessources(Building building, User user)
@@ -80,7 +80,8 @@ namespace Shard.API.Controllers
             if (planet == null) return;
             while (true)
             {
-                await Task.Delay(60000);
+
+                await _systemClock.Delay(60000);
                 if (planet.GetNumberOfSolidRessourcesLeft() > 0)
                 {
                     // Pick first the most abundant resource on the planet
@@ -124,7 +125,8 @@ namespace Shard.API.Controllers
             if (planet == null) return;
             while (true)
             {
-                await Task.Delay(60000);
+
+                await _systemClock.Delay(60000);
                 if (planet.GetNumberOfLiquidRessourcesLeft() > 0)
                 {
                     // Add one ressource "water" to user and reduce this ressource from planet
@@ -138,6 +140,7 @@ namespace Shard.API.Controllers
                         user.ResourcesQuantity.Add(ResourceKind.Water, 1);
                     }
                 }
+
             }
         }
 
@@ -149,6 +152,7 @@ namespace Shard.API.Controllers
             if (planet == null) return;
             while (true)
             {
+                await _systemClock.Delay(60000);
                 if (planet.GetNumberOfGasRessourcesLeft() > 0)
                 {
                     // Add one ressource "oxygen" to user from planet
@@ -162,6 +166,7 @@ namespace Shard.API.Controllers
                         user.ResourcesQuantity.Add(ResourceKind.Oxygen, 1);
                     }
                 }
+
             }
         }
 

@@ -105,7 +105,7 @@ namespace Shard.API.Controllers
                         }
                     }
                     planet.ResourceQuantity[mostAbundantRessources] -= 1;
-                    user.ResourcesQuantity[mostAbundantRessources.ToString()] += 1;
+                    user.ResourcesQuantity[mostAbundantRessources] += 1;
                 }
                 else
                 {
@@ -129,13 +129,13 @@ namespace Shard.API.Controllers
                 {
                     // Add one ressource "water" to user and reduce this ressource from planet
                     planet.ResourceQuantity[ResourceKind.Water] -= 1;
-                    if (user.ResourcesQuantity.ContainsKey("Water"))
+                    if (user.ResourcesQuantity.ContainsKey(ResourceKind.Water))
                     {
-                        user.ResourcesQuantity["Water"] += 1;
+                        user.ResourcesQuantity[ResourceKind.Water] += 1;
                     }
                     else
                     {
-                        user.ResourcesQuantity.Add("Water", 1);
+                        user.ResourcesQuantity.Add(ResourceKind.Water, 1);
                     }
                 }
             }
@@ -153,24 +153,25 @@ namespace Shard.API.Controllers
                 {
                     // Add one ressource "oxygen" to user from planet
                     planet.ResourceQuantity[ResourceKind.Oxygen] -= 1;
-                    if (user.ResourcesQuantity.ContainsKey("Oxygen"))
+                    if (user.ResourcesQuantity.ContainsKey(ResourceKind.Oxygen))
                     {
-                        user.ResourcesQuantity["Oxygen"] += 1;
+                        user.ResourcesQuantity[ResourceKind.Oxygen] += 1;
                     }
                     else
                     {
-                        user.ResourcesQuantity.Add("Oxygen", 1);
+                        user.ResourcesQuantity.Add(ResourceKind.Oxygen, 1);
                     }
                 }
             }
         }
 
         [HttpGet("{userId}/[controller]")]
-        public ActionResult<List<Building>> GetBuildings(string userId)
+        public ActionResult<List<BuildingJson>> GetBuildings(string userId)
         {
             User? user = _users.FirstOrDefault(x => x.Id == userId);
             if (user == null) return NotFound();
-            return user.Buildings;
+
+            return user.Buildings.Select(b=>new BuildingJson(b)).ToList();
         }
 
         [HttpGet("{userId}/[controller]/{buildingId}")]

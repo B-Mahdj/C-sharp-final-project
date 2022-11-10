@@ -14,6 +14,7 @@ namespace Shard.API.Models
         public string? Planet { get; set; }
         public bool? IsBuilt { get; set; } = false;
         public DateTime? EstimatedBuildTime { get; set; }
+
         public Task? BuildingTask { get; set; }
 
 

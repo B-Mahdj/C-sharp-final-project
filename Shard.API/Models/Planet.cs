@@ -31,13 +31,10 @@ namespace Shard.API.Models
         public int GetNumberOfSolidRessourcesLeft()
         {
             int numberOfSolidRessourcesLeft = 0;
-            // Iterate through this.ResourceQuantity if key equals "aluminium", "carbon", "gold", "iron", "titanium" add value to numberOfSolidRessourcesLeft
-            foreach (var resource in this.ResourceQuantity)
+            Dictionary<ResourceKind, int> solidRessources = this.GetListOfSolidRessources();
+            foreach (var resource in solidRessources)
             {
-                if (resource.Key.Equals(ResourceKind.Carbon) || resource.Key.Equals(ResourceKind.Aluminium) || resource.Key.Equals(ResourceKind.Gold) || resource.Key.Equals(ResourceKind.Iron) || resource.Key.Equals(ResourceKind.Titanium))
-                {
-                    numberOfSolidRessourcesLeft += resource.Value;
-                }
+                numberOfSolidRessourcesLeft += resource.Value;
             }
             return numberOfSolidRessourcesLeft;
         }
@@ -48,7 +45,7 @@ namespace Shard.API.Models
             // Iterate through this.ResourceQuantity if key equals "water" add value to numberOfLiquidRessourcesLeft
             foreach (var resource in this.ResourceQuantity)
             {
-                if (resource.Key.Equals(ResourceKind.Oxygen))
+                if (resource.Key.Equals(ResourceKind.Water))
                 {
                     numberOfLiquidRessourcesLeft += resource.Value;
                 }
@@ -72,6 +69,21 @@ namespace Shard.API.Models
             }
             return numberOfGasRessourcesLeft;
 
+        }
+
+        public Dictionary<ResourceKind, int> GetListOfSolidRessources()
+        {
+            // Return the dictionnary containing only the solid ressources
+            Dictionary<ResourceKind, int> solidRessources = new Dictionary<ResourceKind, int>();
+            // Iterate through this.ResourceQuantity if key equals "aluminium", "carbon", "gold", "iron", "titanium" add value and key to dictionary
+            foreach (var resource in this.ResourceQuantity)
+            {
+                if (resource.Key.Equals(ResourceKind.Carbon) || resource.Key.Equals(ResourceKind.Aluminium) || resource.Key.Equals(ResourceKind.Gold) || resource.Key.Equals(ResourceKind.Iron) || resource.Key.Equals(ResourceKind.Titanium))
+                {
+                    solidRessources.Add(resource.Key, resource.Value);
+                }
+            }
+            return solidRessources;
         }
 
 

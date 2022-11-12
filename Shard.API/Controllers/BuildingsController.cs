@@ -80,36 +80,26 @@ namespace Shard.API.Controllers
             if (planet == null) return;
             while (true)
             {
-
                 await _systemClock.Delay(60000);
                 if (planet.GetNumberOfSolidRessourcesLeft() > 0)
                 {
-                    // Pick first the most abundant resource on the planet
+                    // Create a dictionnary that will only contains the solid ressources of the planet
+                    Dictionary<ResourceKind, int> solidRessources = planet.GetListOfSolidRessources();
 
-                    //Default values
-                    ResourceKind mostAbundantRessources = ResourceKind.Carbon;
-                    int mostAbundantRessourcesQuantity = 0;
-                    foreach (var resource in planet.ResourceQuantity)
+                    // Sort the dictionnary by value in descending order if two values are equal, sort by key in this order : Titanium, Gold, Aluminium, Iron, Carbon
+                    ResourceKind mostAbundantRessource = solidRessources.OrderByDescending(x => x.Value).ThenByDescending(x => x.Key, new RessourceComp()).First().Key;
+                    planet.ResourceQuantity[mostAbundantRessource]--;
+                    if (user.ResourcesQuantity.ContainsKey(mostAbundantRessource))
                     {
-                        if (resource.Key.Equals(ResourceKind.Carbon) || resource.Key.Equals(ResourceKind.Aluminium) || resource.Key.Equals(ResourceKind.Gold) || resource.Key.Equals(ResourceKind.Iron) || resource.Key.Equals(ResourceKind.Titanium))
-                        {
-                            if (resource.Value > mostAbundantRessourcesQuantity)
-                            {
-                                mostAbundantRessources = resource.Key;
-                                mostAbundantRessourcesQuantity = resource.Value;
-                            }
-                            else if (resource.Value == mostAbundantRessourcesQuantity)
-                            {
-                                // If 2 resources are equally abundant, pick the one in that order : Titanium, Gold, Aluminium, Iron, Carbon
-                                
-                            }
-                        }
+                        user.ResourcesQuantity[mostAbundantRessource] += 1;
                     }
-                    planet.ResourceQuantity[mostAbundantRessources] -= 1;
-                    user.ResourcesQuantity[mostAbundantRessources] += 1;
+                    else
+                    {
+                        user.ResourcesQuantity.Add(mostAbundantRessource, 1);
+                    }
                 }
                 else
-                {
+                    {
                     // For now nothing, because we may have organic ressources in V5 but we should return the task here 
                     // to avoid having ressources being used for nothing
                 }

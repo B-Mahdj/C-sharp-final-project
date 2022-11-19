@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using Shard.API.Models;
 using Shard.Shared.Core;
 
@@ -42,12 +43,12 @@ namespace Shard.API.Controllers
             building.Planet = unit.Planet;
             building.IsBuilt = false;
             building.EstimatedBuildTime = _systemClock.Now.AddMinutes(5);
-            building.BuildingTask = BuildMine(building, user);
+            building.BuildingTask = BuildMine(building, user, building.TokenSource.Token);
             user.Buildings.Add(building);
             return new BuildingJson(building);
         }
 
-        private async Task BuildMine(Building building, User user)
+        private async Task BuildMine(Building building, User user, CancellationToken token)
         {
             await _systemClock.Delay(300000);
             building.EstimatedBuildTime = null;
@@ -173,25 +174,22 @@ namespace Shard.API.Controllers
         public async Task<ActionResult<BuildingJson>> GetBuilding(string userId, string buildingId)
         {
             User? user = _users.FirstOrDefault(x => x.Id == userId);
+            Unit? unit = user?.Units.FirstOrDefault(x => x.Type == "builder");
             if (user == null) return NotFound();
             Building? building = user.Buildings.FirstOrDefault(x => x.Id == buildingId && x.Type == "mine");
             if (building == null) return NotFound();
-            if (building.EstimatedBuildTime == null)
+            if (building.EstimatedBuildTime != null && _systemClock.Now.AddSeconds(2) >= building.EstimatedBuildTime.Value)
             {
-                return new BuildingJson(building);
-            }
-            else if (_systemClock.Now.AddSeconds(2) >= building.EstimatedBuildTime.Value)
-            {
-                try
+                while ((bool)!building.IsBuilt)
                 {
-                    await building.BuildingTask;
-                }
-                catch (OperationCanceledException)
-                {
-                    return NotFound("Building creation was cancelled");
+                    if (building.TokenSource.IsCancellationRequested)
+                    {
+                        return NotFound("building not found");
+                    }
                 }
             }
+           
             return new BuildingJson(building);
         }
-    }
+        }
 }

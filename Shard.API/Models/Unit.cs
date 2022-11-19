@@ -11,7 +11,9 @@ namespace Shard.API.Models
         public string? DestinationSystem { get; set; }
         public string? DestinationPlanet { get; set; }
         public string? EstimatedTimeOfArrival { get; set; }
+        [JsonIgnore]
         public Task? MovingTask { get; set; }
+       
 
 
         [JsonConstructor]
@@ -21,6 +23,7 @@ namespace Shard.API.Models
             this.Type = type;
             this.System = system;
             this.Planet = planet;
+
         }
         public Unit(string id, string type, string system)
         {
@@ -28,6 +31,8 @@ namespace Shard.API.Models
             this.Type = type;
             this.System = system;
             this.Planet = null;
+            
+
         }
     }
 }

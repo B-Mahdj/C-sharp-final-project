@@ -13,6 +13,8 @@ namespace Shard.API.Models
         public string? EstimatedTimeOfArrival { get; set; }
         [JsonIgnore]
         public Task? MovingTask { get; set; }
+        [JsonIgnore]
+        public Task? BuildingTask { get; set; }
 
 
         public UnitJson(Unit unit)

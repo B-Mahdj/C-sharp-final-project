@@ -13,8 +13,7 @@ namespace Shard.API.Models
         public string? Planet { get; set; }
         public bool IsBuilt { get; set; }
         public DateTime? EstimatedBuildTime { get; set; }
-        [JsonIgnore]
-        public Task? BuildingTask { get; set; }
+
 
 
         public BuildingJson(Building building)
@@ -27,7 +26,6 @@ namespace Shard.API.Models
             this.Planet = building.Planet;
             this.IsBuilt = building.IsBuilt ?? false;
             this.EstimatedBuildTime = building.EstimatedBuildTime;
-            this.BuildingTask = building.BuildingTask;
         }
     }
 }

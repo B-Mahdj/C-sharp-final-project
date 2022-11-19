@@ -16,6 +16,13 @@ namespace Shard.API.Models
         public DateTime? EstimatedBuildTime { get; set; }
         [JsonIgnore]
         public Task? BuildingTask { get; set; }
+        [JsonIgnore]
+        public CancellationTokenSource TokenSource { get; set; }
+
+        public Boolean IsCancelled { get; set; }
+
+
+
 
 
         public Building(string type, string builderId, string resourceCategory)
@@ -23,6 +30,8 @@ namespace Shard.API.Models
             this.Type = type;
             this.BuilderId = builderId;
             this.ResourceCategory = resourceCategory;
+            this.TokenSource = new CancellationTokenSource();
+            this.IsCancelled = false;
         }
 
     }

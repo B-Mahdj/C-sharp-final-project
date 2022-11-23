@@ -1,4 +1,4 @@
-namespace Shard.Shared.Web.IntegrationTests.TestEntities;
+﻿namespace Shard.Shared.Web.IntegrationTests.TestEntities;
 
 public record Unit(string UserPath, JObjectAsserter Json)
 { 
@@ -35,6 +35,11 @@ public record Unit(string UserPath, JObjectAsserter Json)
     {
         get => Json["destinationPlanet"].AssertString();
         set => Json.SetPropertyValue("destinationPlanet", value);
+    }
+    public string? DestinationShard
+    {
+        get => Json["destinationShard"].AssertString();
+        set => Json.SetPropertyValue("destinationShard", value);
     }
     public int Health => Json["health"].AssertInteger();
 

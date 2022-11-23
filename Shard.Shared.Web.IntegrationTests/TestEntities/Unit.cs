@@ -1,4 +1,4 @@
-﻿namespace Shard.Shared.Web.IntegrationTests.TestEntities;
+namespace Shard.Shared.Web.IntegrationTests.TestEntities;
 
 public record Unit(string UserPath, JObjectAsserter Json)
 { 
@@ -37,6 +37,25 @@ public record Unit(string UserPath, JObjectAsserter Json)
         set => Json.SetPropertyValue("destinationPlanet", value);
     }
     public int Health => Json["health"].AssertInteger();
+
+    public ResourcesQuantity? ResourcesQuantity 
+    {
+        get
+        {
+            var json = Json.GetPropertyOrNull("resourcesQuantity");
+            return json != null ? new(json) : null;
+        }
+    }
+
+    public ResourcesQuantity GetOrCreateResourcesQuantity()
+    {
+        if (ResourcesQuantity == null)
+            Json.SetPropertyAsNewObject("resourcesQuantity");
+        return new(Json["resourcesQuantity"]);
+    }
+
+    public void SetResourcesQuantity(Action<ResourcesQuantity> resourceMutator)
+        => resourceMutator(GetOrCreateResourcesQuantity());
 
     public override string ToString() => Json.ToString();
 }

@@ -19,7 +19,6 @@ namespace Shard.API.Models
         [JsonIgnore]
         public CancellationTokenSource TokenSource { get; set; }
 
-        public Boolean IsCancelled { get; set; }
 
 
 
@@ -31,7 +30,6 @@ namespace Shard.API.Models
             this.BuilderId = builderId;
             this.ResourceCategory = resourceCategory;
             this.TokenSource = new CancellationTokenSource();
-            this.IsCancelled = false;
         }
 
     }

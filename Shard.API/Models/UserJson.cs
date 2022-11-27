@@ -7,7 +7,7 @@ namespace Shard.API.Models
     {
         public string Id { get; set; }
         public string Pseudo { get; set; }
-        public string DateOfCreation { get; } = DateTime.Now.ToString();
+        public DateTime DateOfCreation { get; }
         
         [JsonIgnore]
         public List<Unit> Units { get; }

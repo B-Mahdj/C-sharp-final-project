@@ -1,4 +1,5 @@
-﻿using Shard.Shared.Core;
+﻿using Newtonsoft.Json;
+using Shard.Shared.Core;
 
 namespace Shard.API.Models
 {
@@ -6,11 +7,12 @@ namespace Shard.API.Models
     {
         public string Id { get; set; }
         public string Pseudo { get; set; }
-        public string DateOfCreation { get; } = DateTime.Now.ToString();
-
+        public DateTime DateOfCreation { get; } = DateTime.Now;
+        [JsonIgnore]
         public List<Unit> Units { get; } = new List<Unit>();
+        [JsonIgnore]
         public List<Building> Buildings { get; } = new List<Building>();
-        public Dictionary<ResourceKind, int> ResourcesQuantity { get; }
+        public Dictionary<ResourceKind, int> ResourcesQuantity { get; set; }
 
         public User(string id, string pseudo)
         {

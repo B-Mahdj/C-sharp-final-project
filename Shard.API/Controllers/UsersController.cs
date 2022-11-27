@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using Shard.API.Models;
 using System.Text.RegularExpressions;
 
@@ -23,6 +24,7 @@ namespace Shard.API.Controllers
         [HttpPut("{id}")]
         public ActionResult<UserJson> AddUser(User user, string id)
         {
+
             StarSystem system = _sector.GetOneRandomStarSystem();
             //TODO : Return 404 if : 
             //If there is no body, or if the id in the body is different than the one in the url.
@@ -30,11 +32,21 @@ namespace Shard.API.Controllers
             {
                 return BadRequest();
             }
+            User existingUser = _users.FirstOrDefault(x => x.Id == user.Id);
+            if (existingUser != null)
+            {
+                if (Request.Headers.TryGetValue("Authorization", out StringValues headerValues))
+                {    
+                    existingUser.ResourcesQuantity = user.ResourcesQuantity;
+                }
+                return new UserJson(existingUser);
+            }
             string systemName = system.GetOneRandomPlanet().Name;
             Unit firstUnit = new(Guid.NewGuid().ToString(), "scout", system.Name);
             Unit secondUnit = new(Guid.NewGuid().ToString(), "builder", system.Name);
             user.Units.Add(firstUnit);
             user.Units.Add(secondUnit);
+            
             _users.Add(user);
             return new UserJson(user);
         }

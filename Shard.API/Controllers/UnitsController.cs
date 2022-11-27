@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using Shard.API.Models;
 using Shard.Shared.Core;
 using System.Collections.Immutable;
@@ -75,55 +76,58 @@ namespace Shard.API.Controllers
         [HttpPut("{id}/[controller]/{unitId}")]
         public ActionResult<UnitJson> MoveUnits(string id, string unitId, Unit newUnit)
         {
-            foreach (var user in _users)
+            User? user = _users.FirstOrDefault(x => x.Id == id);
+            if (user == null) { return NotFound(); }
+            Unit unit = user.Units.FirstOrDefault(x => x.Id == unitId);
+            if (unit == null)
             {
-                if (user.Id == id)
+                if (Request.Headers.TryGetValue("Authorization", out StringValues headerValues))
                 {
-                    foreach (var unit in user.Units)
-                    {
-                        if (unit.Id == unitId)
-                        {
-                            if (newUnit == null || newUnit.Id != unitId)
-                                return BadRequest();
-                            if (newUnit.DestinationPlanet != null )
-                            {
-                                unit.DestinationPlanet = newUnit.DestinationPlanet;
-                            }
-                            if (newUnit.DestinationSystem != null)
-                            {
-                                unit.DestinationSystem = newUnit.DestinationSystem;
-                            }
-                            if (newUnit.DestinationPlanet != unit.Planet || newUnit.DestinationSystem != unit.System)
-                            {
-                                CancelBuild(user, unit.Id);
-                            }
-                            if (newUnit.DestinationPlanet == null && newUnit.DestinationSystem != null && unit.System != newUnit.DestinationSystem)
-                            {
-                                CancelBuild(user, unit.Id);
-                                unit.MovingTask = MoveUnitToNewSystem(unit, newUnit.DestinationSystem);
-                                unit.EstimatedTimeOfArrival = _systemClock.Now.AddSeconds(60).ToString();
-                            }
-                            else if(newUnit.DestinationPlanet != null && unit.Planet != newUnit.DestinationPlanet && (newUnit.DestinationSystem == null  || unit.System == newUnit.DestinationSystem))
-                            {
-                                CancelBuild(user, unit.Id);
-                                unit.MovingTask = MoveUnitToNewPlanet(unit, newUnit.DestinationPlanet);
-                                unit.EstimatedTimeOfArrival = _systemClock.Now.AddSeconds(15).ToString();
-                            }
-                            else if (newUnit.DestinationPlanet != null && newUnit.DestinationSystem != null 
-                                && unit.System != newUnit.DestinationSystem && unit.Planet != newUnit.DestinationPlanet)
-                            {
-                                CancelBuild(user, unit.Id);
-                                unit.MovingTask = MoveUnitToNewSystemAndPlanet(unit, newUnit.DestinationSystem, newUnit.DestinationPlanet);
-                                unit.EstimatedTimeOfArrival = _systemClock.Now.AddSeconds(75).ToString();
-                               
-                            }
-                            
-                            return new UnitJson(unit);
-                        }
-                    }
+                    Unit createdUnit = new(unitId, newUnit.Type, newUnit.System, newUnit.Planet);
+                    user.Units.Add(createdUnit);
+                    createdUnit.DestinationSystem = newUnit.System;
+                    createdUnit.DestinationPlanet = newUnit.Planet;
+                    unit = createdUnit;
+                }
+                else
+                {
+                    return Unauthorized();
                 }
             }
-            return NotFound();
+            if (newUnit == null || newUnit.Id != unitId)
+                return BadRequest();
+            if (newUnit.DestinationPlanet != null)
+            {
+                unit.DestinationPlanet = newUnit.DestinationPlanet;
+            }
+            if (newUnit.DestinationSystem != null)
+            {
+                unit.DestinationSystem = newUnit.DestinationSystem;
+            }
+            if (newUnit.DestinationPlanet != unit.Planet || newUnit.DestinationSystem != unit.System)
+            {
+                CancelBuild(user, unit.Id);
+            }
+            if (newUnit.DestinationPlanet == null && newUnit.DestinationSystem != null && unit.System != newUnit.DestinationSystem)
+            {
+                CancelBuild(user, unit.Id);
+                unit.MovingTask = MoveUnitToNewSystem(unit, newUnit.DestinationSystem);
+                unit.EstimatedTimeOfArrival = _systemClock.Now.AddSeconds(60).ToString();
+            }
+            else if (newUnit.DestinationPlanet != null && unit.Planet != newUnit.DestinationPlanet && (newUnit.DestinationSystem == null || unit.System == newUnit.DestinationSystem))
+            {
+                CancelBuild(user, unit.Id);
+                unit.MovingTask = MoveUnitToNewPlanet(unit, newUnit.DestinationPlanet);
+                unit.EstimatedTimeOfArrival = _systemClock.Now.AddSeconds(15).ToString();
+            }
+            else if (newUnit.DestinationPlanet != null && newUnit.DestinationSystem != null
+                && unit.System != newUnit.DestinationSystem && unit.Planet != newUnit.DestinationPlanet)
+            {
+                CancelBuild(user, unit.Id);
+                unit.MovingTask = MoveUnitToNewSystemAndPlanet(unit, newUnit.DestinationSystem, newUnit.DestinationPlanet);
+                unit.EstimatedTimeOfArrival = _systemClock.Now.AddSeconds(75).ToString();
+            } 
+            return new UnitJson(unit);
         }
         
         private async Task MoveUnitToNewPlanet(Unit unit, string destinationPlanet)

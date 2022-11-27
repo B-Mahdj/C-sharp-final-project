@@ -24,17 +24,17 @@ namespace Shard.API.Controllers
         }
 
         [HttpPost("{userId}/[controller]")]
-        public ActionResult<BuildingJson> AddMine(string userId, Building building)
+        public ActionResult<BuildingJson> AddBuilding(string userId, Building building)
         {
             User? user = _users.FirstOrDefault(x => x.Id == userId);
-            if (user == null) return NotFound();
+            if (user == null) return NotFound("User not found");
             Unit? unit = user.Units.FirstOrDefault(x => x.Type.Equals("builder"));
             
-            if (unit == null || building == null || building.Type != "mine" || building.BuilderId != unit.Id || unit.Planet==null)
+            if (unit == null || building == null || building.Type != "mine" && building.Type!="starport" || building.BuilderId != unit.Id || unit.Planet==null)
             {
                 return BadRequest();
             }
-            if (building.ResourceCategory != "solid" && building.ResourceCategory != "liquid" && building.ResourceCategory != "gaseous")
+            if (building.ResourceCategory != "solid" && building.ResourceCategory != "liquid" && building.ResourceCategory != "gaseous" && building.Type=="mine")
             {
                 return BadRequest();
             }
@@ -42,18 +42,24 @@ namespace Shard.API.Controllers
             building.System = unit.System;
             building.Planet = unit.Planet;
             building.IsBuilt = false;
+            if (building.Type == "starport")
+            {
+                building.ResourceCategory = null;
+            }
             building.EstimatedBuildTime = _systemClock.Now.AddMinutes(5);
-            building.BuildingTask = BuildMine(building, user, building.TokenSource.Token);
+            building.BuildingTask = BuildMine(building, user);
             user.Buildings.Add(building);
+
             return new BuildingJson(building);
         }
 
-        private async Task BuildMine(Building building, User user, CancellationToken token)
+        private async Task BuildMine(Building building, User user)
         {
             await _systemClock.Delay(300000);
             building.EstimatedBuildTime = null;
             building.IsBuilt = true;
-            MineRessources(building, user);
+            if (building.Type == "mine")
+                MineRessources(building, user);
         }
 
         private async Task MineRessources(Building building, User user)
@@ -160,12 +166,100 @@ namespace Shard.API.Controllers
 
             }
         }
+        public Boolean CheckResourcesForQueue(User user, ResourceKind ressourceKind, int value)
+        {
+            if (user.ResourcesQuantity[ressourceKind] < value)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        [HttpPost("/users/{userId}/[controller]/{starportId}/queue")]
+        public ActionResult<UnitJson> CreateUnit(string userId, string starportId, Unit unit) {
+            var user = _users.FirstOrDefault(x => x.Id == userId);
+            if (user == null)
+            {
+                return NotFound("user not found");
+            }
+            var starport = user.Buildings.FirstOrDefault(x => (x.Id == starportId));
+            if(starport == null)
+            {
+                return NotFound("Starport Not found");
+            }
+            else if (starport.Type != "starport" || starport.IsBuilt==false)
+            {
+                return BadRequest();
+            }
+            Unit newUnit = new(Guid.NewGuid().ToString(), unit.Type, starport.System);
+            switch (newUnit.Type)
+            {
+                case "scout":
+                    if(this.CheckResourcesForQueue(user,ResourceKind.Carbon,5)&& this.CheckResourcesForQueue(user, ResourceKind.Iron, 5))
+                    {
+                        user.ResourcesQuantity[ResourceKind.Iron]-=5;
+                        user.ResourcesQuantity[ResourceKind.Carbon] -= 5;
+                        break;
+                    }
+                    else
+                    {
+                        return BadRequest("Not enough resources");
+                    }
+                case "builder":
+                    if (this.CheckResourcesForQueue(user, ResourceKind.Carbon, 5) && this.CheckResourcesForQueue(user, ResourceKind.Iron, 10))
+                    {
+                        user.ResourcesQuantity[ResourceKind.Iron] -= 10;
+                        user.ResourcesQuantity[ResourceKind.Carbon] -= 5;
+                        break;
+                    }
+                    else
+                    {
+                        return BadRequest("Not enough resources");
+                    }
+                case "fighter":
+                    if (this.CheckResourcesForQueue(user, ResourceKind.Aluminium, 10) && this.CheckResourcesForQueue(user, ResourceKind.Iron, 20))
+                    {
+                        user.ResourcesQuantity[ResourceKind.Iron] -= 20;
+                        user.ResourcesQuantity[ResourceKind.Aluminium] -= 10;
+                        break;
+                    }
+                    else
+                    {
+                        return BadRequest("Not enough resources");
+                    }
+                case "bomber":
+                    if (this.CheckResourcesForQueue(user, ResourceKind.Titanium, 10) && this.CheckResourcesForQueue(user, ResourceKind.Iron, 30))
+                    {
+                        user.ResourcesQuantity[ResourceKind.Iron] -= 30;
+                        user.ResourcesQuantity[ResourceKind.Titanium] -= 10;
+                        break;
+                    }
+                    else
+                    {
+                        return BadRequest("Not enough resources");
+                    }
+                case "cruiser":
+                    if (this.CheckResourcesForQueue(user, ResourceKind.Gold, 20) && this.CheckResourcesForQueue(user, ResourceKind.Iron, 60))
+                    {
+                        user.ResourcesQuantity[ResourceKind.Iron] -= 60;
+                        user.ResourcesQuantity[ResourceKind.Gold] -= 20;
+                        break;
+                    }
+                    else
+                    {
+                        return BadRequest("Not enough resources");
+                    }
+            }
+            user.Units.Add(newUnit);
+            return new UnitJson(newUnit);
+        
+        }
 
         [HttpGet("{userId}/[controller]")]
         public ActionResult<List<BuildingJson>> GetBuildings(string userId)
         {
             User? user = _users.FirstOrDefault(x => x.Id == userId);
-            if (user == null) return NotFound();
+            if (user == null) return NotFound("User not Found");
 
             return user.Buildings.Select(b=>new BuildingJson(b)).ToList();
         }
@@ -175,9 +269,10 @@ namespace Shard.API.Controllers
         {
             User? user = _users.FirstOrDefault(x => x.Id == userId);
             Unit? unit = user?.Units.FirstOrDefault(x => x.Type == "builder");
-            if (user == null) return NotFound();
-            Building? building = user.Buildings.FirstOrDefault(x => x.Id == buildingId && x.Type == "mine");
-            if (building == null) return NotFound();
+            if (user == null) return NotFound("User not Found");
+            Building? building = user.Buildings.FirstOrDefault(x => x.Id == buildingId && (x.Type == "mine"||x.Type=="starport"));
+            if (building == null) 
+                return NotFound("bulding not found hihi");
             if (building.EstimatedBuildTime != null && _systemClock.Now.AddSeconds(2) >= building.EstimatedBuildTime.Value)
             {
                 while ((bool)!building.IsBuilt)
@@ -187,9 +282,12 @@ namespace Shard.API.Controllers
                         return NotFound("building not found");
                     }
                 }
+                await building.BuildingTask;
             }
            
             return new BuildingJson(building);
         }
-        }
+
+       
+    }
 }

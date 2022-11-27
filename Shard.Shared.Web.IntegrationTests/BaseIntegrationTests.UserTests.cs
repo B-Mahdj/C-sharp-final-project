@@ -209,7 +209,6 @@ public partial class BaseIntegrationTests<TEntryPoint, TWebApplicationFactory>
         Assert.Equal(user.Id, updatedUser.Id);
         Assert.Equal(user.Pseudo, updatedUser.Pseudo);
         Assert.Equal(user.DateOfCreation, updatedUser.DateOfCreation);
-
         Assert.Equal(0, updatedUser.ResourcesQuantity.Aluminium);
         Assert.Equal(20, updatedUser.ResourcesQuantity.Carbon);
         Assert.Equal(0, updatedUser.ResourcesQuantity.Gold);

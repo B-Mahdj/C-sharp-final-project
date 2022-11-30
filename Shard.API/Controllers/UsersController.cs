@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using Shard.API.Models;
+using Shard.Shared.Core;
 using System.Text.RegularExpressions;
 
 namespace Shard.API.Controllers
@@ -14,11 +15,13 @@ namespace Shard.API.Controllers
     {
         private readonly List<User> _users;
         private readonly Sector _sector;
+        private readonly IClock _systemClock;
 
-        public UsersController(List<User> list, Sector sector)
+        public UsersController(List<User> list, Sector sector, IClock systemClock)
         {
             _users = list;
             _sector = sector;
+            _systemClock = systemClock;
         }
 
         [HttpPut("{id}")]
@@ -42,8 +45,8 @@ namespace Shard.API.Controllers
                 return new UserJson(existingUser);
             }
             string systemName = system.GetOneRandomPlanet().Name;
-            Unit firstUnit = new(Guid.NewGuid().ToString(), "scout", system.Name);
-            Unit secondUnit = new(Guid.NewGuid().ToString(), "builder", system.Name);
+            Unit firstUnit = new(Guid.NewGuid().ToString(), "scout", system.Name, _systemClock, _users);
+            Unit secondUnit = new(Guid.NewGuid().ToString(), "builder", system.Name, _systemClock, _users);
             user.Units.Add(firstUnit);
             user.Units.Add(secondUnit);
             

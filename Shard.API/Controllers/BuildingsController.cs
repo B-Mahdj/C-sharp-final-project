@@ -191,7 +191,7 @@ namespace Shard.API.Controllers
             {
                 return BadRequest();
             }
-            Unit newUnit = new(Guid.NewGuid().ToString(), unit.Type, starport.System);
+            Unit newUnit = new(Guid.NewGuid().ToString(), unit.Type, starport.System,_systemClock, _users);
             switch (newUnit.Type)
             {
                 case "scout":

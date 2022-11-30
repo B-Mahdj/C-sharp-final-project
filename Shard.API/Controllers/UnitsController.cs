@@ -45,6 +45,11 @@ namespace Shard.API.Controllers
                     {
                         if (unit.Id == unitId)
                         {
+                            if (unit.Health <= 0 && unit.Damage > 0)
+                            {
+                                user.Units.Remove(unit);
+                                return NotFound();
+                            }
                             if (unit.EstimatedTimeOfArrival == null || unit.EstimatedTimeOfArrival == "" )
                             {
                                 return new UnitJson(unit);
@@ -83,7 +88,7 @@ namespace Shard.API.Controllers
             {
                 if (Request.Headers.TryGetValue("Authorization", out StringValues headerValues))
                 {
-                    Unit createdUnit = new(unitId, newUnit.Type, newUnit.System, newUnit.Planet);
+                    Unit createdUnit = new(unitId, newUnit.Type, newUnit.System, newUnit.Planet, _systemClock, _users);
                     user.Units.Add(createdUnit);
                     createdUnit.DestinationSystem = newUnit.System;
                     createdUnit.DestinationPlanet = newUnit.Planet;

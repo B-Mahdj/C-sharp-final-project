@@ -28,5 +28,12 @@ namespace Shard.API.Models
             int randIndex = random.Next(Systems.Count);
             return Systems[randIndex];
         }
+
+        public StarSystem? GetStarSystemByName(string systemName)
+        {
+            StarSystem? system = Systems.FirstOrDefault(s => s.Name == systemName);
+            return system;
+        }
+
     }
 }

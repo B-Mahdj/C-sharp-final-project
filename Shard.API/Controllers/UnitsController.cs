@@ -85,7 +85,6 @@ namespace Shard.API.Controllers
                         {
                             if (newUnit == null || newUnit.Id != unitId)
                                 return BadRequest();
-
                             if (newUnit.DestinationPlanet != null )
                             {
                                 unit.DestinationPlanet = newUnit.DestinationPlanet;
@@ -94,23 +93,29 @@ namespace Shard.API.Controllers
                             {
                                 unit.DestinationSystem = newUnit.DestinationSystem;
                             }
-                            
-
+                            if (newUnit.DestinationPlanet != unit.Planet || newUnit.DestinationSystem != unit.System)
+                            {
+                                CancelBuild(user, unit.Id);
+                            }
                             if (newUnit.DestinationPlanet == null && newUnit.DestinationSystem != null && unit.System != newUnit.DestinationSystem)
                             {
+                                CancelBuild(user, unit.Id);
                                 unit.MovingTask = MoveUnitToNewSystem(unit, newUnit.DestinationSystem);
                                 unit.EstimatedTimeOfArrival = _systemClock.Now.AddSeconds(60).ToString();
                             }
                             else if(newUnit.DestinationPlanet != null && unit.Planet != newUnit.DestinationPlanet && (newUnit.DestinationSystem == null  || unit.System == newUnit.DestinationSystem))
                             {
+                                CancelBuild(user, unit.Id);
                                 unit.MovingTask = MoveUnitToNewPlanet(unit, newUnit.DestinationPlanet);
                                 unit.EstimatedTimeOfArrival = _systemClock.Now.AddSeconds(15).ToString();
                             }
                             else if (newUnit.DestinationPlanet != null && newUnit.DestinationSystem != null 
                                 && unit.System != newUnit.DestinationSystem && unit.Planet != newUnit.DestinationPlanet)
                             {
+                                CancelBuild(user, unit.Id);
                                 unit.MovingTask = MoveUnitToNewSystemAndPlanet(unit, newUnit.DestinationSystem, newUnit.DestinationPlanet);
                                 unit.EstimatedTimeOfArrival = _systemClock.Now.AddSeconds(75).ToString();
+                               
                             }
                             
                             return new UnitJson(unit);
@@ -141,6 +146,27 @@ namespace Shard.API.Controllers
             unit.Planet = null;
             await MoveUnitToNewSystem(unit, destinationSystem);
             await MoveUnitToNewPlanet(unit, destinationPlanet);
+        }
+
+        private void CancelBuild(User user, String Id)
+        {
+            user.Buildings.FindAll(building => (bool)!building.IsBuilt && building.BuilderId == Id).ForEach(building =>
+            {
+                try
+                {
+                    building.TokenSource.Cancel();
+                }
+                catch (AggregateException ae)
+                {
+                    Console.WriteLine(ae);
+                }
+                finally
+                {
+                    building.TokenSource.Dispose();
+                    user.Buildings.Remove(building);
+                }
+            });
+
         }
         
 

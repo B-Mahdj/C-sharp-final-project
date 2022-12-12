@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using Shard.Shared.Core;
+using System.Text.Json.Serialization;
 
 namespace Shard.API.Models
 {
@@ -10,7 +11,10 @@ namespace Shard.API.Models
         
         [JsonIgnore]
         public List<Unit> Units { get; }
-        public IReadOnlyDictionary<String, int> ResourcesQuantity { get; }
+        [JsonIgnore]
+        public List<Building> Buildings { get; } = new List<Building>();
+
+        public IReadOnlyDictionary<ResourceKind, int> ResourcesQuantity { get; }
 
         public UserJson(User user)
         {
@@ -18,6 +22,7 @@ namespace Shard.API.Models
             this.Pseudo = user.Pseudo;
             this.DateOfCreation = user.DateOfCreation;
             this.Units = user.Units;
+            this.Buildings = user.Buildings;
             this.ResourcesQuantity = user.ResourcesQuantity;
         }
     }

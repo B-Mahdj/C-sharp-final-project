@@ -31,5 +31,11 @@ namespace Shard.API.Models
             int randIndex = random.Next(Planets.Count);
             return Planets[randIndex];
         }
+
+        public Planet? GetPlanetByName(string planetName)
+        {
+            Planet? planet = Planets.FirstOrDefault(p => p.Name == planetName);
+            return planet;
+        }
     }
 }

@@ -28,7 +28,7 @@ namespace Shard.API.Controllers
         {
             User? user = _users.FirstOrDefault(x => x.Id == userId);
             if (user == null) return NotFound("User not found");
-            Unit? unit = user.Units.FirstOrDefault(x => x.Type.Equals("builder"));
+            Unit? unit = user.Units.FirstOrDefault(x => x.Id.Equals(building.BuilderId)) ;
             
             if (unit == null || building == null || building.Type != "mine" && building.Type!="starport" || building.BuilderId != unit.Id || unit.Planet==null)
             {
@@ -64,17 +64,17 @@ namespace Shard.API.Controllers
 
         private async Task MineRessources(Building building, User user)
         {
-            if (building.ResourceCategory == "solid")
+            switch (building.ResourceCategory)
             {
-                MineSolid(building, user);
-            }
-            else if (building.ResourceCategory == "liquid")
-            {
-                MineLiquid(building, user);
-            }
-            else if (building.ResourceCategory == "gaseous")
-            {
-                MineGas(building, user);
+                case "solid":
+                    MineSolid(building, user);
+                    break;
+                case "liquid":
+                    MineLiquid(building, user);
+                    break;
+                case "gaseous":
+                    MineGas(building, user);
+                    break;
             }
             return;
         }
@@ -191,7 +191,7 @@ namespace Shard.API.Controllers
             {
                 return BadRequest();
             }
-            Unit newUnit = new(Guid.NewGuid().ToString(), unit.Type, starport.System,_systemClock, _users);
+            Unit newUnit = new(Guid.NewGuid().ToString(), unit.Type, starport.System,starport.Planet, _systemClock, _users, null);
             switch (newUnit.Type)
             {
                 case "scout":
@@ -243,6 +243,19 @@ namespace Shard.API.Controllers
                     {
                         user.ResourcesQuantity[ResourceKind.Iron] -= 60;
                         user.ResourcesQuantity[ResourceKind.Gold] -= 20;
+                        break;
+                    }
+                    else
+                    {
+                        return BadRequest("Not enough resources");
+                    }
+                case "cargo":
+                    if (this.CheckResourcesForQueue(user, ResourceKind.Carbon, 10) && this.CheckResourcesForQueue(user, ResourceKind.Iron, 10)
+                        && this.CheckResourcesForQueue(user, ResourceKind.Gold, 5))
+                    {
+                        user.ResourcesQuantity[ResourceKind.Carbon] -= 10;
+                        user.ResourcesQuantity[ResourceKind.Iron] -= 10;
+                        user.ResourcesQuantity[ResourceKind.Gold] -= 5;
                         break;
                     }
                     else

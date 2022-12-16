@@ -12,6 +12,7 @@ namespace Shard.API.Models
         public string? Planet { get; set; }
         public string? DestinationSystem { get; set; }
         public string? DestinationPlanet { get; set; }
+        public string? DestinationShard { get; set; }
         public string? EstimatedTimeOfArrival { get; set; }
         [JsonIgnore]
         public Task? MovingTask { get; set; }
@@ -19,6 +20,7 @@ namespace Shard.API.Models
         public int Damage { get; set; }
         public int ReloadTime { get; set; }
         public int Health { get; set; }
+        public Dictionary<ResourceKind, int>? ResourcesQuantity { get; set; }
 
 
 
@@ -31,12 +33,18 @@ namespace Shard.API.Models
             this.Planet = planet;
         }
 
-        public Unit(string id, string type, string system, string planet, IClock systemClock, List<User> users)
+        public Unit(string id, string type, string system, string planet, int health,
+                    Dictionary<ResourceKind, int> resourcesQuantity, IClock systemClock, List<User> users)
         {
             this.Id = id;
             this.Type = type;
             this.System = system;
             this.Planet = planet;
+            this.DestinationPlanet = planet;
+            this.DestinationSystem = system;
+            this.Health = health;
+            this.ResourcesQuantity = resourcesQuantity;
+   
             switch (Type)
             {
                 case ("fighter"):
@@ -59,12 +67,23 @@ namespace Shard.API.Models
                     break;
             }
         }
-        public Unit(string id, string type, string system, IClock systemClock, List<User> users)
+        public Unit(string id, string type, string system, string planet,
+                    IClock systemClock, List<User> users, Dictionary<ResourceKind, int> resourcesQuantity)
         {
             this.Id = id;
             this.Type = type;
             this.System = system;
+            this.DestinationSystem = system;
+            this.DestinationPlanet = planet;
             this.SystemClock = systemClock;
+            this.ResourcesQuantity = new Dictionary<ResourceKind, int>();
+            foreach (ResourceKind resource in Enum.GetValues(typeof(ResourceKind)))
+            {
+               this.ResourcesQuantity.Add(resource, 0);
+            }
+            
+            if(resourcesQuantity != null)
+                this.ResourcesQuantity = resourcesQuantity;
             switch (Type)
             {
                 case ("fighter"):
@@ -84,6 +103,10 @@ namespace Shard.API.Models
                     ReloadTime = 6;
                     Health = 400;
                     Fighting(this, users, systemClock);
+                    break;
+                case ("cargo"):
+                    if (Health == 0)
+                        Health = 100;
                     break;
             }
         }

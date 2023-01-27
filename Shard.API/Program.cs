@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Options;
 using Shard.API.Models;
 using Shard.Shared.Core;
 using System.Diagnostics;
@@ -11,6 +12,7 @@ builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializ
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpClient();
 builder.Services.AddSingleton<MapGenerator>();
 builder.Services.AddSingleton<Sector>();
 builder.Services.AddSingleton(new List<User>());

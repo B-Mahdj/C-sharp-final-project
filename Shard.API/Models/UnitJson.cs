@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using Shard.Shared.Core;
+using System.Text.Json.Serialization;
 
 namespace Shard.API.Models
 {
@@ -20,6 +21,7 @@ namespace Shard.API.Models
         [JsonIgnore]
         public int ReloadTime { get; set; }
         public int Health { get; set; }
+        public Dictionary<ResourceKind, int>? ResourcesQuantity { get; set; }
 
 
         public UnitJson(Unit unit)
@@ -35,6 +37,7 @@ namespace Shard.API.Models
             Damage = unit.Damage;
             ReloadTime = unit.ReloadTime;
             Health = unit.Health;
+            ResourcesQuantity = unit.ResourcesQuantity;
         }
     }
 }

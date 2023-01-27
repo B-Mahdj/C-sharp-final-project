@@ -29,26 +29,34 @@ namespace Shard.API.Controllers
         {
 
             StarSystem system = _sector.GetOneRandomStarSystem();
-            //TODO : Return 404 if : 
-            //If there is no body, or if the id in the body is different than the one in the url.
+            
             if (user == null || user.Id != id || !(Regex.IsMatch(user.Id, "^[a-zA-Z0-9_-]+$")))
             {
                 return BadRequest();
             }
-            User existingUser = _users.FirstOrDefault(x => x.Id == user.Id);
+            bool isAuthorized = Request.Headers.TryGetValue("Authorization", out StringValues headerValues);
+            User? existingUser = _users.FirstOrDefault(x => x.Id == user.Id);
             if (existingUser != null)
             {
-                if (Request.Headers.TryGetValue("Authorization", out StringValues headerValues))
+                if (isAuthorized)
                 {    
                     existingUser.ResourcesQuantity = user.ResourcesQuantity;
                 }
                 return new UserJson(existingUser);
             }
             string systemName = system.GetOneRandomPlanet().Name;
-            Unit firstUnit = new(Guid.NewGuid().ToString(), "scout", system.Name, _systemClock, _users);
-            Unit secondUnit = new(Guid.NewGuid().ToString(), "builder", system.Name, _systemClock, _users);
-            user.Units.Add(firstUnit);
-            user.Units.Add(secondUnit);
+            if (!isAuthorized)
+            {
+                Unit firstUnit = new(Guid.NewGuid().ToString(), "scout", system.Name, null, _systemClock, _users, null);
+                Unit secondUnit = new(Guid.NewGuid().ToString(), "builder", system.Name,null, _systemClock, _users, null);
+                user.Units.Add(firstUnit);
+                user.Units.Add(secondUnit);
+            }
+            else
+            {
+                foreach (ResourceKind resource in Enum.GetValues(typeof(ResourceKind)))
+                    user.ResourcesQuantity[resource] = 0;
+            }
             
             _users.Add(user);
             return new UserJson(user);
@@ -57,16 +65,14 @@ namespace Shard.API.Controllers
         [HttpGet("{id}")]
         public ActionResult<UserJson> GetUser(string id)
         {
-            foreach(var u in _users)
+            User? user = _users.FirstOrDefault(x => x.Id == id);
+            
+            if(user != null)
             {
-                if(u.Id == id)
-                {
-                    return new UserJson(u);
-                }
+                return new UserJson(user);
             }
             return NotFound();
         }
-
 
     }
 }

@@ -26,11 +26,9 @@ namespace Shard.API.Controllers
         [HttpGet("{systemName}")]
         public ActionResult<StarSystemJson> GetSystem(string systemName)
         {
-            StarSystem? starsystem;
-            foreach (var system in _sector.Systems)
-            {
-                if (system.Name == systemName) { starsystem = system; return new StarSystemJson(starsystem); }
-
+            StarSystem? starSystem = _sector.Systems.FirstOrDefault(system => system.Name == systemName);
+            if (starSystem != null) {
+                return new StarSystemJson(starSystem); 
             }
             return BadRequest();
         }
@@ -38,17 +36,9 @@ namespace Shard.API.Controllers
         [HttpGet("{systemName}/planets")]
         public ActionResult<List<PlanetJson>> GetPlanets(string systemName)
         {
-           
-            foreach (var system in _sector.Systems)
-            {
-                if (system.Name == systemName)
-                {
-                    StarSystem starSystem = system;
-                    //planetList = starsystem.Planets.ToList();
-                    //return planetList;
-                    return starSystem.Planets.Select(p => new PlanetJson(p)).ToList(); 
-                }
-
+            StarSystem? starSystem = _sector.Systems.FirstOrDefault(system => system.Name == systemName);
+            if (starSystem != null) { 
+                return starSystem.Planets.Select(p => new PlanetJson(p)).ToList(); 
             }
             return BadRequest();
         }
@@ -56,20 +46,11 @@ namespace Shard.API.Controllers
         [HttpGet("{systemName}/planets/{planetName}")]
         public ActionResult<PlanetJson> GetPlanet(string systemName, string planetName)
         {
-            Planet? planet;
-            foreach (var system in _sector.Systems)
+            Planet? planet = _sector.Systems.FirstOrDefault(system => system.Name == systemName).
+                             Planets.FirstOrDefault(planet => planet.Name == planetName);
+            if (planet != null)
             {
-                if (system.Name == systemName)
-                {
-                    StarSystem starsystem = system;
-                    foreach (var p in starsystem.Planets)
-                    {
-                        if (p.Name == planetName)
-                        {
-                            return new PlanetJson(planet = p);
-                        }
-                    }
-                }
+                return new PlanetJson(planet);
             }
             return BadRequest();
         }

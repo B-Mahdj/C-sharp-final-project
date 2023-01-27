@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using Shard.Shared.Core;
+using System.Text.Json.Serialization;
 
 namespace Shard.API.Models
 {
@@ -15,6 +16,12 @@ namespace Shard.API.Models
         public Task? MovingTask { get; set; }
         [JsonIgnore]
         public Task? BuildingTask { get; set; }
+        [JsonIgnore]
+        public int Damage { get; set; }
+        [JsonIgnore]
+        public int ReloadTime { get; set; }
+        public int Health { get; set; }
+        public Dictionary<ResourceKind, int>? ResourcesQuantity { get; set; }
 
 
         public UnitJson(Unit unit)
@@ -27,6 +34,10 @@ namespace Shard.API.Models
             DestinationPlanet = unit.DestinationPlanet;
             EstimatedTimeOfArrival = unit.EstimatedTimeOfArrival;
             MovingTask = unit.MovingTask;
+            Damage = unit.Damage;
+            ReloadTime = unit.ReloadTime;
+            Health = unit.Health;
+            ResourcesQuantity = unit.ResourcesQuantity;
         }
     }
 }

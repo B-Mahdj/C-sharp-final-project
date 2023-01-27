@@ -36,5 +36,11 @@ public class JObjectAsserter : BaseJTokenAsserter
     public void SetPropertyValue(string property, string? value)
         => Token[property] = value;
 
+    public void SetPropertyValue(string property, int? value)
+        => Token[property] = value;
+
+    public void SetPropertyAsNewObject(string property)
+        => Token[property] = new JObject();
+
     public ICollection<string> Keys => ((IDictionary<string, JToken?>)Token).Keys;
 }

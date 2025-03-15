@@ -9,6 +9,15 @@ public class JArrayAsserter: BaseJTokenAsserter
     public void AssertNotEmpty()
         => Assert.NotEmpty(Token);
 
+    public void AssertEmpty()
+        => Assert.Empty(Token);
+
+    public JTokenAsserter AssertSingle()
+    { 
+        Assert.Single(Token);
+        return new(Token.Single());
+    }
+
     public JTokenAsserter AssertHasItem(int index)
     {
         var childToken = Token[index];

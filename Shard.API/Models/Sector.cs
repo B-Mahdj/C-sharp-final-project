@@ -21,5 +21,19 @@ namespace Shard.API.Models
       {
         return JsonConvert.DeserializeObject<Sector>(JsonConvert.SerializeObject(sector))!;
       }
+
+        public StarSystem GetOneRandomStarSystem()
+        {
+            Random random = new Random();
+            int randIndex = random.Next(Systems.Count);
+            return Systems[randIndex];
+        }
+
+        public StarSystem? GetStarSystemByName(string systemName)
+        {
+            StarSystem? system = Systems.FirstOrDefault(s => s.Name == systemName);
+            return system;
+        }
+
     }
 }

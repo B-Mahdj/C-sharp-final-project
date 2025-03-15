@@ -1,5 +1,8 @@
 ﻿using Newtonsoft.Json;
+using System.Diagnostics;
 using System.Net;
+using System.Net.Http.Json;
+using System.Text;
 using Xunit.Sdk;
 
 namespace Shard.Shared.Web.IntegrationTests;
@@ -16,6 +19,20 @@ public static class Extensions
         var token = await JToken.LoadAsync(jsonReader);
         Assert.IsAssignableFrom<T>(token);
         return (T)token;
+    }
+
+    public static Task<HttpResponseMessage> PutTestEntityAsync<T>(this HttpClient client, string uri, T unit)
+    {
+        return client.PutAsync(uri, new StringContent(
+            unit?.ToString() ?? "",
+            Encoding.UTF8,
+            "application/json"));
+    }
+
+    public static async Task<Unit> PutAsync(this HttpClient client, Unit unit)
+    {
+        using var response = await client.PutTestEntityAsync(unit.Url, unit);
+        return new Unit(unit.UserPath, await response.AssertSuccessJsonAsync());
     }
 
     public static async Task AssertSuccessStatusCode(this HttpResponseMessage response)
@@ -56,5 +73,11 @@ public static class Extensions
         return response.Content != null
             ? string.Concat("Body:", Environment.NewLine, await response.Content.ReadAsStringAsync())
             : "No body";
+    }
+
+    public static void SetTimeoutIfNotDebug(this HttpClient client, TimeSpan timeout)
+    {
+        if (!Debugger.IsAttached)
+            client.Timeout = timeout;
     }
 }

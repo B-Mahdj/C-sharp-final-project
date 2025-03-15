@@ -11,63 +11,46 @@ namespace Shard.API.Controllers
     [ApiController]
     public class SystemsController : ControllerBase
     {
-        private static List<StarSystem> array = null;
+        private readonly Sector _sector;
+        public SystemsController(Sector sector)
+        {
+            _sector = sector;
+        }
 
         [HttpGet]
-        public ActionResult<List<StarSystem>> Get([FromServices] Sector sector)
+        public ActionResult<List<StarSystemJson>> Get()
         {
-
-            return Ok(sector.Systems);
+            return _sector.Systems.Select(s => new StarSystemJson(s)).ToList();
         }
 
         [HttpGet("{systemName}")]
-        public ActionResult<StarSystem> GetSystem(string systemName, [FromServices] Sector sector)
+        public ActionResult<StarSystemJson> GetSystem(string systemName)
         {
-            StarSystem? starsystem = null;
-            foreach (var system in sector.Systems)
-            {
-                if (system.Name == systemName) { starsystem = system; return Ok(starsystem); }
-
+            StarSystem? starSystem = _sector.Systems.FirstOrDefault(system => system.Name == systemName);
+            if (starSystem != null) {
+                return new StarSystemJson(starSystem); 
             }
             return BadRequest();
-
-
         }
 
         [HttpGet("{systemName}/planets")]
-        public ActionResult<Planet> GetPlanets(string systemName, [FromServices] Sector sector)
+        public ActionResult<List<PlanetJson>> GetPlanets(string systemName)
         {
-            List<Planet> planetList = null;
-            foreach (var system in sector.Systems)
-            {
-                if (system.Name == systemName)
-                {
-                    StarSystem starsystem = system;
-                    planetList = starsystem.Planets.ToList();
-                    return Ok(planetList);
-                }
-
+            StarSystem? starSystem = _sector.Systems.FirstOrDefault(system => system.Name == systemName);
+            if (starSystem != null) { 
+                return starSystem.Planets.Select(p => new PlanetJson(p)).ToList(); 
             }
             return BadRequest();
         }
 
         [HttpGet("{systemName}/planets/{planetName}")]
-        public ActionResult<Planet> GetPlanet(string systemName, string planetName, [FromServices] Sector sector)
+        public ActionResult<PlanetJson> GetPlanet(string systemName, string planetName)
         {
-            Planet? planet = null;
-            foreach (var system in sector.Systems)
+            Planet? planet = _sector.Systems.FirstOrDefault(system => system.Name == systemName).
+                             Planets.FirstOrDefault(planet => planet.Name == planetName);
+            if (planet != null)
             {
-                if (system.Name == systemName)
-                {
-                    StarSystem starsystem = system;
-                    foreach (var p in starsystem.Planets)
-                    {
-                        if (p.Name == planetName)
-                        {
-                            return Ok(planet = p);
-                        }
-                    }
-                }
+                return new PlanetJson(planet);
             }
             return BadRequest();
         }
